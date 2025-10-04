@@ -5,9 +5,9 @@ using UnityEngine;
 public enum DebtCollectionMethod
 {
     None,
-    Violent,    // 暴力讨债
     Gentle,     // 温和催债
-    Legal       // 法律催债
+    Legal,      // 法律催债
+    Violent     // 暴力讨债
 }
 
 public class HexTile : MonoBehaviour
@@ -22,7 +22,7 @@ public class HexTile : MonoBehaviour
     public float debtCost = 100.0f; // 初次借贷价格
 
     public float collectionCooldown = 8.0f; // 产出CD
-    public float currentCollectionCooldown = 8.0f; // 当前CD
+    private float currentCollectionCooldown = 8.0f; // 当前CD
 
     public float baseCollectionValue = 15.0f; // 基础产出值
     public float currentCollectionRate = 1.0f; // 当前收账率 0-1
@@ -34,9 +34,12 @@ public class HexTile : MonoBehaviour
     public float supportLevel_temp = 0.1f; // 不受联结度影响前的支持度
     public float unioLevel = 0.0f; // 联结度 0-1
 
+    private DebtCollectionMethod currentCollectionMethod = DebtCollectionMethod.None;
+    public float DebtCollectionMethodCooldown = 30.0f; // 催债方式CD
+    public float currentDebtCollectionMethodCooldown = 0.0f; // 当前CD
 
-    public DebtCollectionMethod currentCollectionMethod = DebtCollectionMethod.None;
     private GameManager gameManager_;
+    private FloatingTextController floatingTextController_;
 
     [Header("相邻地块")]
     public List<HexTile> neighbors = new List<HexTile>();
@@ -44,6 +47,7 @@ public class HexTile : MonoBehaviour
     [Header("可视化组件")]
     public SpriteRenderer spriteRenderer;
     public Color unlockedColor = Color.white;
+    public Color resistanceColor = Color.red;
     public Color lockedColor = Color.gray;
 
     // 六边形方向向量 (Q, R 坐标)，对于q为偶数的tile
@@ -69,7 +73,7 @@ public class HexTile : MonoBehaviour
     };
 
     private static readonly float collectionRestitutionFactor = 1f / (3f * 8.0f);
-    private static readonly float resistanceReduceFactor = 100f / 180f;
+    private static readonly float resistanceReduceFactor = 1f / 180f;
     
 
     private void Awake()
@@ -78,6 +82,8 @@ public class HexTile : MonoBehaviour
             spriteRenderer = GetComponent<SpriteRenderer>();
         if (gameManager_ == null)
             gameManager_ = FindFirstObjectByType<GameManager>();
+        if (floatingTextController_ == null)
+            floatingTextController_ = FindFirstObjectByType<FloatingTextController>();
     }
 
     private void Start()
@@ -89,7 +95,11 @@ public class HexTile : MonoBehaviour
     {
         if(isUnlocked)
         {
+            if (currentDebtCollectionMethodCooldown > 0)
+                currentDebtCollectionMethodCooldown -= Time.deltaTime;
+
             UpdateAttribute();
+            UpdateVisuals();
             CalculateProduct();
         }
     }
@@ -124,39 +134,38 @@ public class HexTile : MonoBehaviour
     /// <summary>
     /// 执行催债
     /// </summary>
-    //public void ExecuteDebtCollection(DebtCollectionMethod method)
-    //{
-    //    if (!isUnlocked) return;
+    public void ExecuteDebtCollection(DebtCollectionMethod method)
+    {
+        if (!isUnlocked || currentDebtCollectionMethodCooldown > 0) return;
 
-    //    currentCollectionMethod = method;
-    //    currentCollectionCooldown = 3f; // 3秒冷却
+        currentCollectionMethod = method;
+        currentDebtCollectionMethodCooldown = DebtCollectionMethodCooldown; // 冷却
 
-    //    float baseCollection = 0f;
-    //    float resistanceChange = 0f;
-
-    //    switch (method)
-    //    {
-    //        case DebtCollectionMethod.Violent:
-    //            baseCollection = 0.7f;
-    //            resistanceChange = 0.4f;
-    //            break;
-    //        case DebtCollectionMethod.Gentle:
-    //            baseCollection = 0.3f;
-    //            resistanceChange = -0.1f;
-    //            break;
-    //        case DebtCollectionMethod.Legal:
-    //            baseCollection = 0.5f;
-    //            resistanceChange = 0.1f;
-    //            break;
-    //    }
-
-    //    // 计算联结度加成
-    //    float connectionBonus = CalculateConnectionBonus();
-    //    float finalCollectionRate = Mathf.Clamp(baseCollection + connectionBonus, 0.1f, 0.9f);
-
-    //    // 更新反抗度
-    //    resistanceLevel = Mathf.Clamp(resistanceLevel + resistanceChange, 0f, 1f);
-    //}
+        switch (method)
+        {
+            //case DebtCollectionMethod.Violent:
+            //    baseCollection = 0.7f;
+            //    resistanceChange = 0.4f;
+            //    break;
+            //case DebtCollectionMethod.Gentle:
+            //    baseCollection = 0.3f;
+            //    resistanceChange = -0.1f;
+            //    break;
+            //case DebtCollectionMethod.Legal:
+            //    baseCollection = 0.5f;
+            //    resistanceChange = 0.1f;
+            //    break;
+            case DebtCollectionMethod.Gentle:
+                Debug.Log("1");
+                break;
+            case DebtCollectionMethod.Legal:
+                Debug.Log("2");
+                break;
+            case DebtCollectionMethod.Violent:
+                Debug.Log("3");
+                break;
+        }
+    }
 
     /// <summary>
     /// 计算联结度加成
@@ -206,6 +215,11 @@ public class HexTile : MonoBehaviour
         {
             float needIncome = baseCollectionValue * currentCollectionRate;
             gameManager_.Income(needIncome);
+
+            var selfPos = HexToWorldPosition(q, r);
+            floatingTextController_.ShowMoneyText(selfPos, needIncome);
+
+            // Reset CD
             currentCollectionCooldown += collectionCooldown;
         }
         
@@ -224,11 +238,10 @@ public class HexTile : MonoBehaviour
         }
         else
         {
-            // 根据债务比例混合颜色
-            //float debtRatio = debtAmount / Mathf.Max(investmentAmount, 1f);
-            //Color baseColor = ;
-            //Color targetColor = Color.Lerp(baseColor, debtColor, debtRatio);
-            spriteRenderer.color = unlockedColor;
+            // 根据民怨度混合颜色
+            Color baseColor = unlockedColor;
+            Color targetColor = Color.Lerp(baseColor, resistanceColor, Math.Max(resistanceLevel-0.2f,0f)*0.8f);
+            spriteRenderer.color = targetColor;
         }
     }
 

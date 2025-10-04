@@ -52,7 +52,6 @@ MonoBehaviour:
   isUnlocked: 0
   debtCost: 100
   collectionCooldown: 8
-  currentCollectionCooldown: 8
   baseCollectionValue: 15
   currentCollectionRate: 1
   baseCollectionRate: 0.8
@@ -61,10 +60,12 @@ MonoBehaviour:
   supportLevel: 0.1
   supportLevel_temp: 0.1
   unioLevel: 0
-  currentCollectionMethod: 0
+  DebtCollectionMethodCooldown: 30
+  currentDebtCollectionMethodCooldown: 0
   neighbors: []
   spriteRenderer: {fileID: 0}
   unlockedColor: {r: 1, g: 1, b: 1, a: 1}
+  resistanceColor: {r: 1, g: 0, b: 0, a: 1}
   lockedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!212 &7989409822508056636
 SpriteRenderer:
