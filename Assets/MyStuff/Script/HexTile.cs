@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,9 +29,10 @@ public class HexTile : MonoBehaviour
     public float baseCollectionRate = 0.8f; // 基础收账率 0-1
     public float targetCollectionRate = 1f; // 目标收账率 0-1
 
-    public float resistanceLevel = 0.0f; // 反抗度 0-1
-    public float supportLevel = 0.0f; // 支持度 0-1
-    public float unioLevel = 0.5f; // 联结度 0-1
+    public float resistanceLevel = 0.3f; // 反抗度 0-1
+    public float supportLevel = 0.1f; // 支持度 0-1
+    public float supportLevel_temp = 0.1f; // 不受联结度影响前的支持度
+    public float unioLevel = 0.0f; // 联结度 0-1
 
 
     public DebtCollectionMethod currentCollectionMethod = DebtCollectionMethod.None;
@@ -66,6 +68,10 @@ public class HexTile : MonoBehaviour
         new Vector2Int(-1, -1)   // 左下
     };
 
+    private static readonly float collectionRestitutionFactor = 1f / (3f * 8.0f);
+    private static readonly float resistanceReduceFactor = 100f / 180f;
+    
+
     private void Awake()
     {
         if (spriteRenderer == null)
@@ -83,7 +89,7 @@ public class HexTile : MonoBehaviour
     {
         if(isUnlocked)
         {
-            UpdateCollectionRate();
+            UpdateAttribute();
             CalculateProduct();
         }
     }
@@ -169,10 +175,22 @@ public class HexTile : MonoBehaviour
     //}
 
     /// <summary>
-    /// 更新收债率
+    /// 更新各种属性
     /// </summary>
-    private void UpdateCollectionRate()
+    private void UpdateAttribute()
     {
+        // 反抗度（民怨值）
+        resistanceLevel = Math.Max(resistanceLevel - resistanceReduceFactor * Time.deltaTime, 0);
+
+        // 支持度
+        supportLevel = unioLevel + supportLevel_temp;
+
+        // 目标收账率
+        targetCollectionRate = Math.Clamp(baseCollectionRate + supportLevel - resistanceLevel, 0, 1);
+
+        // 当前收账率
+        float alpha = collectionRestitutionFactor * Time.deltaTime;
+        currentCollectionRate = currentCollectionRate * (1f - alpha) + targetCollectionRate * alpha;
 
     }
 

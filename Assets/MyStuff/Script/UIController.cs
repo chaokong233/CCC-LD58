@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class HexUIController : MonoBehaviour
 {
     [Header("UI引用")]
-    public GameObject unlockPanel;
+    public GameObject hexPanel;
     public Button unlockButton;
     public TextMeshProUGUI tileInfoText;
     public TextMeshProUGUI costText;
@@ -34,12 +34,12 @@ public class HexUIController : MonoBehaviour
         unlockButton.onClick.AddListener(OnUnlockButtonClicked);
 
         // 获取面板的RectTransform
-        if (unlockPanel != null)
-            panelRectTransform = unlockPanel.GetComponent<RectTransform>();
+        if (hexPanel != null)
+            panelRectTransform = hexPanel.GetComponent<RectTransform>();
 
         // 初始隐藏面板
-        if (unlockPanel != null)
-            unlockPanel.SetActive(false);
+        if (hexPanel != null)
+            hexPanel.SetActive(false);
     }
 
     void Update()
@@ -49,6 +49,10 @@ public class HexUIController : MonoBehaviour
         {
             HandleTileClick();    
         }
+
+        // 如果开着，更新Panel Info
+        if (hexPanel.activeSelf)
+            UpdatePanelInfo();
 
         // 更新资金显示
         if (gameManager != null && fundsText != null)
@@ -92,9 +96,9 @@ public class HexUIController : MonoBehaviour
     {
         currentSelectedTile = tile;
 
-        if (unlockPanel != null)
+        if (hexPanel != null)
         {
-            unlockPanel.SetActive(true);
+            hexPanel.SetActive(true);
             SetUnlockCost(currentSelectedTile.debtCost);
 
             // 更新面板位置（确保在屏幕内）
@@ -133,7 +137,7 @@ public class HexUIController : MonoBehaviour
         screenPos.y = Mathf.Clamp(screenPos.y, minY, maxY);
 
         // 设置面板位置
-        unlockPanel.transform.position = screenPos;
+        hexPanel.transform.position = screenPos;
 
         // 可选：如果面板位置被调整，可以添加一个箭头指向地块
         // 这里可以添加一个箭头指向地块的视觉指示器
@@ -144,8 +148,8 @@ public class HexUIController : MonoBehaviour
     /// </summary>
     public void HidePanel()
     {
-        if (unlockPanel != null)
-            unlockPanel.SetActive(false);
+        if (hexPanel != null)
+            hexPanel.SetActive(false);
 
         currentSelectedTile = null;
     }
@@ -158,8 +162,17 @@ public class HexUIController : MonoBehaviour
         if (currentSelectedTile == null) return;
 
         // 更新地块信息文本
-        tileInfoText.text = $"地块 {currentSelectedTile.tileName}\n" +
-                           $"坐标: ({currentSelectedTile.q}, {currentSelectedTile.r})";
+        if (currentSelectedTile.isUnlocked)
+        {
+            tileInfoText.text = $"地块 {currentSelectedTile.tileName}\n"
+                + string.Format("当前收账率:{0:P1}\n", currentSelectedTile.currentCollectionRate)
+                + string.Format("民怨值:{0:F1}\n", currentSelectedTile.resistanceLevel)
+                + string.Format("支持度:{0:F1}\n", currentSelectedTile.supportLevel);
+        }
+        else
+        {
+            tileInfoText.text = $"地块 {currentSelectedTile.tileName}\n";
+        }
 
         // 更新成本文本
         costText.text = $"解锁成本: {unlockCost}";

@@ -57,9 +57,10 @@ MonoBehaviour:
   currentCollectionRate: 1
   baseCollectionRate: 0.8
   targetCollectionRate: 1
-  resistanceLevel: 0
-  supportLevel: 0
-  unioLevel: 0.5
+  resistanceLevel: 0.3
+  supportLevel: 0.1
+  supportLevel_temp: 0.1
+  unioLevel: 0
   currentCollectionMethod: 0
   neighbors: []
   spriteRenderer: {fileID: 0}
