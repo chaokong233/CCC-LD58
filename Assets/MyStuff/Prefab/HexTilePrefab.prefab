@@ -50,6 +50,8 @@ MonoBehaviour:
   r: 0
   tileName: 
   isUnlocked: 0
+  isRebelContinent: 0
+  isCalmedDown: 0
   debtCost: 100
   collectionCooldown: 8
   baseCollectionValue: 15
@@ -70,15 +72,21 @@ MonoBehaviour:
   neighbors: []
   spriteRenderer: {fileID: 0}
   unlockedColor: {r: 1, g: 1, b: 1, a: 1}
-  cityUnlockedColor: {r: 0.9622642, g: 0.87686664, b: 0.1845851, a: 1}
-  suburbUnlockedColor: {r: 0.8238993, g: 0.48353657, b: 0.16840704, a: 1}
-  ruralUnlockedColor: {r: 0.5920683, g: 0.99371064, b: 0.3656104, a: 1}
-  lakeUnlockedColor: {r: 0.2040465, g: 0.3134444, b: 0.3584906, a: 1}
-  mountainUnlockedColor: {r: 0.19091403, g: 0.30817598, b: 0.23279329, a: 1}
+  cityUnlockedColor: {r: 0.98742133, g: 0.9317648, b: 0.46265966, a: 1}
+  suburbUnlockedColor: {r: 0.836478, g: 0.5637791, b: 0.31302157, a: 1}
+  ruralUnlockedColor: {r: 0.7038003, g: 0.9811321, b: 0.54610175, a: 1}
+  lakeUnlockedColor: {r: 0.14052047, g: 0.2608885, b: 0.30817598, a: 1}
+  mountainUnlockedColor: {r: 0.16998932, g: 0.2830189, b: 0.20766583, a: 1}
   resistanceColor: {r: 1, g: 0, b: 0, a: 1}
-  lockedColor: {r: 0.2264151, g: 0.22570309, b: 0.22570309, a: 1}
+  lockedColor: {r: 0.2830189, g: 0.2830189, b: 0.2830189, a: 1}
   tileType: 0
-  TileTypeSprites: []
+  TileTypeSprites:
+  - {fileID: 7399533318584292489, guid: 0ae20bb839c1d1242bf9945b7abe9136, type: 3}
+  - {fileID: -1656166294940094332, guid: 63d7371271f52e74e91df25f67e67f9f, type: 3}
+  - {fileID: 6448168300569536659, guid: cafb1691e64ea8a4189ddecd20736b9f, type: 3}
+  - {fileID: 7296514139804409227, guid: 6308acb72e4defa42841ed659c7324c9, type: 3}
+  - {fileID: -2304432510905272006, guid: d67835f7f95dbda478ab5bc2b4fb9c28, type: 3}
+  - {fileID: -1819830194433888264, guid: 6134edec58633fe41a9e5c3ac1736f66, type: 3}
 --- !u!212 &7989409822508056636
 SpriteRenderer:
   m_ObjectHideFlags: 0

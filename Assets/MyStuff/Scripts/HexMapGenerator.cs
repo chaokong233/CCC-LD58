@@ -25,6 +25,12 @@ public class HexMapGenerator : MonoBehaviour
     public int obstacleClusterSize = 4;
     [Range(1, 3)]
     public int suburbRingCount = 2;
+    [Range(1, 4)]
+    public int minCityCount = 1;
+
+    [Header("地图计数")]
+    public List<int> tileTypeCounter = new List<int>(((int)TileType.MaxNum)+1);
+    public List<int> unlockedTileTypeCounter = new List<int>(((int)TileType.MaxNum)+1);
 
     private Dictionary<Vector2Int, HexTile> hexMap = new Dictionary<Vector2Int, HexTile>();
     private List<HexTile> allTiles = new List<HexTile>();
@@ -32,8 +38,11 @@ public class HexMapGenerator : MonoBehaviour
 
     void Start()
     {
-        random = new System.Random(System.DateTime.Now.Millisecond);
-
+        for (int i = 0; i < ((int)TileType.MaxNum) + 1; i++)
+        {
+            tileTypeCounter.Add(0);
+            unlockedTileTypeCounter.Add(0);
+        }
         GenerateHexMap();
         SetupNeighborConnections();
         UnlockStartTile();
@@ -44,25 +53,44 @@ public class HexMapGenerator : MonoBehaviour
     /// </summary>
     void GenerateHexMap()
     {
-        hexMap.Clear();
-        allTiles.Clear();
-
-        for (int q = 0; q < mapWidth; q++)
+        do
         {
-            for (int r = 0; r < mapHeight; r++)
+            random = new System.Random(System.DateTime.Now.Millisecond);
+
+            hexMap.Clear();
+            foreach (var item in allTiles)
             {
-                CreateHexTile(q, r, TileType.Rural);
+                Destroy(item.gameObject);
             }
-        }
+            allTiles.Clear();
 
-        //第二阶段：生成障碍区域（湖泊和山地）
-        GenerateObstacleClusters();
+            for (int q = 0; q < mapWidth; q++)
+            {
+                for (int r = 0; r < mapHeight; r++)
+                {
+                    CreateHexTile(q, r, TileType.Rural);
+                }
+            }
 
-        // 第三阶段：生成城市集群
-        GenerateCityClusters();
+            //第二阶段：生成障碍区域（湖泊和山地）
+            GenerateObstacleClusters();
+            // 第三阶段：生成城市集群
+            GenerateCityClusters();
+            // 第四阶段：确保连通性
+            EnsureConnectivity();
 
-        // 第四阶段：确保连通性
-        EnsureConnectivity();
+            // Counter
+            for (int i = 0; i < tileTypeCounter.Count; i++)
+            {
+                tileTypeCounter[i] = 0;
+            }
+
+            foreach (var tile in hexMap)
+            {
+                tileTypeCounter[(int)tile.Value.tileType]++;
+            }
+
+        } while (tileTypeCounter[(int)TileType.City] < minCityCount);
 
         Debug.Log($"地图生成完成，共 {allTiles.Count} 个地块");
     }
@@ -429,6 +457,8 @@ public class HexMapGenerator : MonoBehaviour
         if (startTile != null)
         {
             startTileCoord = new Vector2Int(startTile.q, startTile.r);
+            unlockedTileTypeCounter[(int)startTile.tileType]++;
+
             startTile.UnlockTile();
             Debug.Log($"智能解锁起始地块: {startTile.tileName} ({startTile.q}, {startTile.r})");
         }
@@ -513,6 +543,8 @@ public class HexMapGenerator : MonoBehaviour
             if (hasUnlockedNeighbor || (q == startTileCoord.x && r == startTileCoord.y))
             {
                 tile.UnlockTile();
+                unlockedTileTypeCounter[(int)tile.tileType]++;
+
                 return true;
             }
             else

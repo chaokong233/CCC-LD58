@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -13,11 +14,14 @@ public class HexUIController : MonoBehaviour
     public TextMeshProUGUI costText;
     public TextMeshProUGUI fundsText;
     [Header("   Ability")]
-    public GameObject AbilityPanel;
+    public GameObject AbilityPanel_normal;
     public Button AbilityButton_01;
     public Button AbilityButton_02;
     public Button AbilityButton_03;
     public Button AbilityButton_04;
+    public GameObject AbilityPanel_quell;
+    public Button AbilityButton_05;
+    public Button AbilityButton_06;
 
     [Header("解锁设置")]
     public float unlockCost = 100f;
@@ -46,6 +50,10 @@ public class HexUIController : MonoBehaviour
         AbilityButton_02.onClick.AddListener(OnAbilityButton_02_ButtonClicked);
         AbilityButton_03.onClick.AddListener(OnAbilityButton_03_ButtonClicked);
         AbilityButton_04.onClick.AddListener(OnAbilityButton_04_ButtonClicked);
+        AbilityButton_05.onClick.AddListener(OnAbilityButton_05_ButtonClicked);
+        AbilityButton_06.onClick.AddListener(OnAbilityButton_06_ButtonClicked);
+
+        // AbilityButton_01.
 
         // 获取面板的RectTransform
         if (hexPanel != null)
@@ -54,6 +62,7 @@ public class HexUIController : MonoBehaviour
         // 初始隐藏面板
         if (hexPanel != null)
             hexPanel.SetActive(false);
+
     }
 
     void Update()
@@ -178,25 +187,60 @@ public class HexUIController : MonoBehaviour
         if (gameManager == null || currentSelectedTile == null) return;
 
         bool isUnlocked = currentSelectedTile.isUnlocked;
+        bool isNotRebel = !currentSelectedTile.isRebelContinent;
 
-        // 更新地块信息文本
-        if (isUnlocked)
+        string tiletext = "";
+        switch(currentSelectedTile.tileType)
         {
-            tileInfoText.text = $"地块 {currentSelectedTile.tileName}\n"
-                + string.Format("当前收账率:{0:P1}\n", currentSelectedTile.currentCollectionRate)
-                + string.Format("民怨值:{0:F2}\n", currentSelectedTile.resistanceLevel)
-                + string.Format("支持度:{0:F2}\n", currentSelectedTile.supportLevel);
+            case TileType.City:
+                tiletext += "City";
+                break;
+            case TileType.Suburb:
+                tiletext += "Suburb";
+                break;
+            case TileType.Rural:
+                tiletext += "Rural";
+                break;
+            case TileType.Mountain:
+                tiletext += "Mountain";
+                break;
+            case TileType.Lake:
+                tiletext += "Lake";
+                break;
+        }
+        if(isNotRebel)
+        {
+            tiletext += "\n";
         }
         else
         {
-            tileInfoText.text = $"地块 {currentSelectedTile.tileName}\n";
+            tiletext += "(Rebel)\n"; 
+        }
+        tiletext += "\n";
+
+        // 更新地块信息文本
+        if (isUnlocked && isNotRebel)
+        {
+            tiletext += string.Format("Collection:{0:P1}\n", currentSelectedTile.currentCollectionRate)
+                + string.Format("ResistanceLevel:{0:F2}\n", currentSelectedTile.resistanceLevel)
+                + string.Format("SupportLevel:{0:F2}\n", currentSelectedTile.supportLevel)
+                + string.Format("LeverageLevel:{0:P1}\n", currentSelectedTile.LeverageLevel);
+            tileInfoText.text = tiletext;
+        }
+        else
+        {
+            if(!isNotRebel)
+            {
+                tiletext += "the tile rebel\nCost to Quell it";
+            }
+            tileInfoText.text = tiletext;
         }
 
         // 判断是否可解锁，并更新提示
         if (isUnlocked)
         {
             unlockButton.interactable = false;
-            costText.text = "已解锁";
+            costText.text = "Unlocked";
         }
         else
         {
@@ -212,33 +256,37 @@ public class HexUIController : MonoBehaviour
 
             bool enoughFunds = gameManager.currentFunds >= unlockCost;
 
-            if(hasUnlockedNeighbor && enoughFunds)
+            bool isNotObstacle = !currentSelectedTile.isObstacle();
+
+            if (hasUnlockedNeighbor && enoughFunds && isNotObstacle)
             {
                 unlockButton.interactable = true;
                 // 更新成本文本
-                costText.text = $"解锁成本:{unlockCost}";
+                costText.text = $"Lending Cost:{unlockCost}";
             }
             else
             {
                 unlockButton.interactable = false;
-                if (!hasUnlockedNeighbor)
-                    costText.text = $"解锁成本:{unlockCost}(不相邻)";
+                if(!isNotObstacle)
+                    costText.text = $"(Cannot be unlocked)";
+                else if (!hasUnlockedNeighbor)
+                    costText.text = $"Lending Cost:{unlockCost}\n(Not adjacent)";
                 else if(!enoughFunds)
-                    costText.text = $"解锁成本:{unlockCost}(资金不足)";
+                    costText.text = $"Lending Cost:{unlockCost}\n(Insufficient funds)";
             }         
         }
 
         // 更新技能面板
-        if (isUnlocked)
+        if (isUnlocked && isNotRebel)
         {
-            AbilityPanel.SetActive(true);
+            AbilityPanel_normal.SetActive(true);
             bool isAbilityAvaible = currentSelectedTile.currentDebtCollectionMethodCooldown <= 0;
             if(isAbilityAvaible)
             {
-                AbilityButton_01.interactable = true;
-                AbilityButton_02.interactable = true;
-                AbilityButton_03.interactable = true;
-                AbilityButton_04.interactable = true;
+                AbilityButton_01.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Gentle];
+                AbilityButton_02.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Legal];
+                AbilityButton_03.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Quell];
+                AbilityButton_04.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Violent];
             }
             else
             {
@@ -250,9 +298,31 @@ public class HexUIController : MonoBehaviour
         }
         else
         {
-            AbilityPanel.SetActive(false);
+            AbilityPanel_normal.SetActive(false);
+            if(!isNotRebel)
+            {
+                AbilityPanel_quell.SetActive(true);
+                AbilityButton_05.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)QuellMethod.CalmDown];
+                AbilityButton_06.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)QuellMethod.Permeation];
+            }
+            else
+            {
+                AbilityPanel_quell.SetActive(false);
+            }
         }
     }
+
+    /// <summary>
+    /// 添加按钮提示
+    /// </summary>
+    private void AddToolkit(Button button, GameObject toolkitPanel)
+    {
+        //button.OnPointerEnter.
+        //button.onPointerExit.AddListener(OnPointerExit);
+        //button.onPointerEnter.AddListener((date) => { OnPointerEnter(toolkitPanel); });
+        //button.onPointerExit.AddListener(OnPointerExit);
+    }
+
 
     /// <summary>
     /// 解锁按钮点击事件
@@ -305,6 +375,22 @@ public class HexUIController : MonoBehaviour
     private void OnAbilityButton_04_ButtonClicked()
     {
         currentSelectedTile.ExecuteDebtCollection(DebtCollectionMethod.Violent);
+    }
+
+    /// <summary>
+    /// 技能按钮点击事件
+    /// </summary>
+    private void OnAbilityButton_05_ButtonClicked()
+    {
+        currentSelectedTile.ExecuteQuell(QuellMethod.CalmDown);
+    }
+
+    /// <summary>
+    /// 技能按钮点击事件
+    /// </summary>
+    private void OnAbilityButton_06_ButtonClicked()
+    {
+        currentSelectedTile.ExecuteQuell(QuellMethod.Permeation);
     }
 
     /// <summary>
