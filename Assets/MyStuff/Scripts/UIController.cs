@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -13,11 +14,14 @@ public class HexUIController : MonoBehaviour
     public TextMeshProUGUI costText;
     public TextMeshProUGUI fundsText;
     [Header("   Ability")]
-    public GameObject AbilityPanel;
+    public GameObject AbilityPanel_normal;
     public Button AbilityButton_01;
     public Button AbilityButton_02;
     public Button AbilityButton_03;
     public Button AbilityButton_04;
+    public GameObject AbilityPanel_quell;
+    public Button AbilityButton_05;
+    public Button AbilityButton_06;
 
     [Header("解锁设置")]
     public float unlockCost = 100f;
@@ -46,6 +50,10 @@ public class HexUIController : MonoBehaviour
         AbilityButton_02.onClick.AddListener(OnAbilityButton_02_ButtonClicked);
         AbilityButton_03.onClick.AddListener(OnAbilityButton_03_ButtonClicked);
         AbilityButton_04.onClick.AddListener(OnAbilityButton_04_ButtonClicked);
+        AbilityButton_05.onClick.AddListener(OnAbilityButton_05_ButtonClicked);
+        AbilityButton_06.onClick.AddListener(OnAbilityButton_06_ButtonClicked);
+
+        // AbilityButton_01.
 
         // 获取面板的RectTransform
         if (hexPanel != null)
@@ -54,6 +62,7 @@ public class HexUIController : MonoBehaviour
         // 初始隐藏面板
         if (hexPanel != null)
             hexPanel.SetActive(false);
+
     }
 
     void Update()
@@ -178,38 +187,52 @@ public class HexUIController : MonoBehaviour
         if (gameManager == null || currentSelectedTile == null) return;
 
         bool isUnlocked = currentSelectedTile.isUnlocked;
+        bool isNotRebel = !currentSelectedTile.isRebelContinent;
 
         string tiletext = "";
         switch(currentSelectedTile.tileType)
         {
             case TileType.City:
-                tiletext += "City\n";
+                tiletext += "City";
                 break;
             case TileType.Suburb:
-                tiletext += "Suburb\n";
+                tiletext += "Suburb";
                 break;
             case TileType.Rural:
-                tiletext += "Rural\n";
+                tiletext += "Rural";
                 break;
             case TileType.Mountain:
-                tiletext += "Mountain\n";
+                tiletext += "Mountain";
                 break;
             case TileType.Lake:
-                tiletext += "Lake\n";
+                tiletext += "Lake";
                 break;
+        }
+        if(isNotRebel)
+        {
+            tiletext += "\n";
+        }
+        else
+        {
+            tiletext += "(Rebel)\n"; 
         }
         tiletext += "\n";
 
         // 更新地块信息文本
-        if (isUnlocked)
+        if (isUnlocked && isNotRebel)
         {
             tiletext += string.Format("Collection:{0:P1}\n", currentSelectedTile.currentCollectionRate)
                 + string.Format("ResistanceLevel:{0:F2}\n", currentSelectedTile.resistanceLevel)
-                + string.Format("SupportLevel:{0:F2}\n", currentSelectedTile.supportLevel);
+                + string.Format("SupportLevel:{0:F2}\n", currentSelectedTile.supportLevel)
+                + string.Format("LeverageLevel:{0:P1}\n", currentSelectedTile.LeverageLevel);
             tileInfoText.text = tiletext;
         }
         else
         {
+            if(!isNotRebel)
+            {
+                tiletext += "the tile rebel\nCost to Quell it";
+            }
             tileInfoText.text = tiletext;
         }
 
@@ -254,16 +277,16 @@ public class HexUIController : MonoBehaviour
         }
 
         // 更新技能面板
-        if (isUnlocked)
+        if (isUnlocked && isNotRebel)
         {
-            AbilityPanel.SetActive(true);
+            AbilityPanel_normal.SetActive(true);
             bool isAbilityAvaible = currentSelectedTile.currentDebtCollectionMethodCooldown <= 0;
             if(isAbilityAvaible)
             {
-                AbilityButton_01.interactable = true;
-                AbilityButton_02.interactable = true;
-                AbilityButton_03.interactable = true;
-                AbilityButton_04.interactable = true;
+                AbilityButton_01.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Gentle];
+                AbilityButton_02.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Legal];
+                AbilityButton_03.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Quell];
+                AbilityButton_04.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Violent];
             }
             else
             {
@@ -275,9 +298,31 @@ public class HexUIController : MonoBehaviour
         }
         else
         {
-            AbilityPanel.SetActive(false);
+            AbilityPanel_normal.SetActive(false);
+            if(!isNotRebel)
+            {
+                AbilityPanel_quell.SetActive(true);
+                AbilityButton_05.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)QuellMethod.CalmDown];
+                AbilityButton_06.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)QuellMethod.Permeation];
+            }
+            else
+            {
+                AbilityPanel_quell.SetActive(false);
+            }
         }
     }
+
+    /// <summary>
+    /// 添加按钮提示
+    /// </summary>
+    private void AddToolkit(Button button, GameObject toolkitPanel)
+    {
+        //button.OnPointerEnter.
+        //button.onPointerExit.AddListener(OnPointerExit);
+        //button.onPointerEnter.AddListener((date) => { OnPointerEnter(toolkitPanel); });
+        //button.onPointerExit.AddListener(OnPointerExit);
+    }
+
 
     /// <summary>
     /// 解锁按钮点击事件
@@ -330,6 +375,22 @@ public class HexUIController : MonoBehaviour
     private void OnAbilityButton_04_ButtonClicked()
     {
         currentSelectedTile.ExecuteDebtCollection(DebtCollectionMethod.Violent);
+    }
+
+    /// <summary>
+    /// 技能按钮点击事件
+    /// </summary>
+    private void OnAbilityButton_05_ButtonClicked()
+    {
+        currentSelectedTile.ExecuteQuell(QuellMethod.CalmDown);
+    }
+
+    /// <summary>
+    /// 技能按钮点击事件
+    /// </summary>
+    private void OnAbilityButton_06_ButtonClicked()
+    {
+        currentSelectedTile.ExecuteQuell(QuellMethod.Permeation);
     }
 
     /// <summary>

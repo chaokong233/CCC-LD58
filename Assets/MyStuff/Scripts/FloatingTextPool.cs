@@ -134,6 +134,19 @@ public class FloatingTextController : MonoBehaviour
     }
 
     /// <summary>
+    /// 在世界位置显示跳字
+    /// </summary>
+    public void ShowText(Vector3 worldPosition, string textContent, Color textColor)
+    {
+        FloatingText text = GetFromPool();
+
+        // 初始化跳字
+        text.Initialize(worldPosition + new Vector3(0, 0.2f, 0), textContent, textColor, textDuration, floatDistance, floatCurve, fadeCurve);
+
+        activeTexts.Add(text);
+    }
+
+    /// <summary>
     /// 清除所有活跃的跳字
     /// </summary>
     public void ClearAllTexts()

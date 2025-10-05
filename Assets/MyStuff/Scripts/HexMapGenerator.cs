@@ -30,6 +30,7 @@ public class HexMapGenerator : MonoBehaviour
 
     [Header("地图计数")]
     public List<int> tileTypeCounter = new List<int>(((int)TileType.MaxNum)+1);
+    public List<int> unlockedTileTypeCounter = new List<int>(((int)TileType.MaxNum)+1);
 
     private Dictionary<Vector2Int, HexTile> hexMap = new Dictionary<Vector2Int, HexTile>();
     private List<HexTile> allTiles = new List<HexTile>();
@@ -40,6 +41,7 @@ public class HexMapGenerator : MonoBehaviour
         for (int i = 0; i < ((int)TileType.MaxNum) + 1; i++)
         {
             tileTypeCounter.Add(0);
+            unlockedTileTypeCounter.Add(0);
         }
         GenerateHexMap();
         SetupNeighborConnections();
@@ -56,6 +58,10 @@ public class HexMapGenerator : MonoBehaviour
             random = new System.Random(System.DateTime.Now.Millisecond);
 
             hexMap.Clear();
+            foreach (var item in allTiles)
+            {
+                Destroy(item.gameObject);
+            }
             allTiles.Clear();
 
             for (int q = 0; q < mapWidth; q++)
@@ -79,9 +85,9 @@ public class HexMapGenerator : MonoBehaviour
                 tileTypeCounter[i] = 0;
             }
 
-            foreach (var tile in allTiles)
+            foreach (var tile in hexMap)
             {
-                tileTypeCounter[(int)tile.tileType]++;
+                tileTypeCounter[(int)tile.Value.tileType]++;
             }
 
         } while (tileTypeCounter[(int)TileType.City] < minCityCount);
@@ -451,6 +457,8 @@ public class HexMapGenerator : MonoBehaviour
         if (startTile != null)
         {
             startTileCoord = new Vector2Int(startTile.q, startTile.r);
+            unlockedTileTypeCounter[(int)startTile.tileType]++;
+
             startTile.UnlockTile();
             Debug.Log($"智能解锁起始地块: {startTile.tileName} ({startTile.q}, {startTile.r})");
         }
@@ -535,6 +543,8 @@ public class HexMapGenerator : MonoBehaviour
             if (hasUnlockedNeighbor || (q == startTileCoord.x && r == startTileCoord.y))
             {
                 tile.UnlockTile();
+                unlockedTileTypeCounter[(int)tile.tileType]++;
+
                 return true;
             }
             else

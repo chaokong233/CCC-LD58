@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0ae20bb839c1d1242bf9945b7abe9136
+guid: cafb1691e64ea8a4189ddecd20736b9f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7399533318584292489
-    second: tile_0
+      213: 6448168300569536659
+    second: suburb_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: tile_0
+      name: suburb_0
       rect:
         serializedVersion: 2
         x: 0
@@ -114,8 +114,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 98452ed495c60b660800000000000000
-      internalID: 7399533318584292489
+      spriteID: 398a16fc7ee7c7950800000000000000
+      internalID: 6448168300569536659
       vertices: []
       indices: 
       edges: []
@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      suburb_0: 6448168300569536659
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
