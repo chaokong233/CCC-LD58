@@ -7,7 +7,17 @@ public enum DebtCollectionMethod
     None,
     Gentle,     // 温和催债
     Legal,      // 法律催债
+    Quell,      // 平息
     Violent     // 暴力讨债
+}
+
+public enum TileType
+{
+    City,       // 城市
+    Suburb,     // 郊区  
+    Rural,      // 农村
+    Lake,       // 湖泊（障碍）
+    Mountain    // 山地（障碍）
 }
 
 public class HexTile : MonoBehaviour
@@ -33,8 +43,13 @@ public class HexTile : MonoBehaviour
     public float supportLevel = 0.1f; // 支持度 0-1
     public float supportLevel_temp = 0.1f; // 不受联结度影响前的支持度
     public float unioLevel = 0.0f; // 联结度 0-1
+    public float LeverageLevel = 0.0f; // 杠杆值 0-1
 
-    private DebtCollectionMethod currentCollectionMethod = DebtCollectionMethod.None;
+    public float resistanceLevelGrowth = -1f / 180f; // 反抗度自然增长
+    public float baseResistanceLevelGrowth = -1f / 180f; // 初始反抗度自然增长
+    public float regionOriginFuns = 1000.0f; // 地区原始资金
+    public float totalGain = 0f; // 总收益资金
+
     public float DebtCollectionMethodCooldown = 30.0f; // 催债方式CD
     public float currentDebtCollectionMethodCooldown = 0.0f; // 当前CD
 
@@ -47,8 +62,18 @@ public class HexTile : MonoBehaviour
     [Header("可视化组件")]
     public SpriteRenderer spriteRenderer;
     public Color unlockedColor = Color.white;
+    public Color cityUnlockedColor = Color.white;
+    public Color suburbUnlockedColor = Color.white;
+    public Color ruralUnlockedColor = Color.white;
+    public Color lakeUnlockedColor = Color.white;
+    public Color mountainUnlockedColor = Color.white;
+
     public Color resistanceColor = Color.red;
     public Color lockedColor = Color.gray;
+
+    [Header("TileType")]
+    public TileType tileType = TileType.City;
+    public Sprite[] TileTypeSprites = {};
 
     // 六边形方向向量 (Q, R 坐标)，对于q为偶数的tile
     private static readonly Vector2Int[] hexDirections_01 =
@@ -73,7 +98,6 @@ public class HexTile : MonoBehaviour
     };
 
     private static readonly float collectionRestitutionFactor = 1f / (3f * 8.0f);
-    private static readonly float resistanceReduceFactor = 1f / 180f;
     
 
     private void Awake()
@@ -119,6 +143,37 @@ public class HexTile : MonoBehaviour
     }
 
     /// <summary>
+    /// 初始化地块类型
+    /// </summary>
+    public void InitializeType(TileType type)
+    {
+        tileType = type;
+        switch(type)
+        {
+            case TileType.City:
+                unlockedColor = cityUnlockedColor;
+                break;
+            case TileType.Rural:
+                unlockedColor = ruralUnlockedColor;
+                break;
+            case TileType.Suburb:
+                unlockedColor = suburbUnlockedColor;
+                break;
+            case TileType.Mountain:
+                unlockedColor = mountainUnlockedColor;
+                break;
+            case TileType.Lake:
+                unlockedColor = lakeUnlockedColor;
+                break;
+        }
+    }
+
+    public bool isObstacle()
+    {
+        return tileType == TileType.Lake || tileType == TileType.Mountain;
+    }
+
+    /// <summary>
     /// 解锁地块
     /// </summary>
     public void UnlockTile()
@@ -138,7 +193,6 @@ public class HexTile : MonoBehaviour
     {
         if (!isUnlocked || currentDebtCollectionMethodCooldown > 0) return;
 
-        currentCollectionMethod = method;
         currentDebtCollectionMethodCooldown = DebtCollectionMethodCooldown; // 冷却
 
         switch (method)
@@ -161,8 +215,11 @@ public class HexTile : MonoBehaviour
             case DebtCollectionMethod.Legal:
                 Debug.Log("2");
                 break;
-            case DebtCollectionMethod.Violent:
+            case DebtCollectionMethod.Quell:
                 Debug.Log("3");
+                break;
+            case DebtCollectionMethod.Violent:
+                Debug.Log("4");
                 break;
         }
     }
@@ -188,8 +245,14 @@ public class HexTile : MonoBehaviour
     /// </summary>
     private void UpdateAttribute()
     {
+        // 杠杆
+        LeverageLevel = totalGain / (regionOriginFuns + totalGain);
+
+        // 反抗度（民怨值）自然增长
+        resistanceLevelGrowth = baseResistanceLevelGrowth + LeverageLevel * 7f/8f;
+
         // 反抗度（民怨值）
-        resistanceLevel = Math.Max(resistanceLevel - resistanceReduceFactor * Time.deltaTime, 0);
+        resistanceLevel = Math.Max(resistanceLevel - resistanceLevelGrowth * Time.deltaTime, 0);
 
         // 支持度
         supportLevel = unioLevel + supportLevel_temp;
@@ -217,6 +280,7 @@ public class HexTile : MonoBehaviour
             gameManager_.Income(needIncome);
 
             var selfPos = HexToWorldPosition(q, r);
+            totalGain += needIncome;
             floatingTextController_.ShowMoneyText(selfPos, needIncome);
 
             // Reset CD
@@ -234,7 +298,7 @@ public class HexTile : MonoBehaviour
 
         if (!isUnlocked)
         {
-            spriteRenderer.color = lockedColor;
+            spriteRenderer.color = Color.Lerp(lockedColor, unlockedColor, 0.2f);
         }
         else
         {

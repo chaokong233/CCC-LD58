@@ -17,6 +17,7 @@ public class HexUIController : MonoBehaviour
     public Button AbilityButton_01;
     public Button AbilityButton_02;
     public Button AbilityButton_03;
+    public Button AbilityButton_04;
 
     [Header("解锁设置")]
     public float unlockCost = 100f;
@@ -44,7 +45,8 @@ public class HexUIController : MonoBehaviour
         AbilityButton_01.onClick.AddListener(OnAbilityButton_01_ButtonClicked);
         AbilityButton_02.onClick.AddListener(OnAbilityButton_02_ButtonClicked);
         AbilityButton_03.onClick.AddListener(OnAbilityButton_03_ButtonClicked);
-       
+        AbilityButton_04.onClick.AddListener(OnAbilityButton_04_ButtonClicked);
+
         // 获取面板的RectTransform
         if (hexPanel != null)
             panelRectTransform = hexPanel.GetComponent<RectTransform>();
@@ -236,12 +238,14 @@ public class HexUIController : MonoBehaviour
                 AbilityButton_01.interactable = true;
                 AbilityButton_02.interactable = true;
                 AbilityButton_03.interactable = true;
+                AbilityButton_04.interactable = true;
             }
             else
             {
                 AbilityButton_01.interactable = false;
                 AbilityButton_02.interactable = false;
                 AbilityButton_03.interactable = false;
+                AbilityButton_04.interactable = false;
             }
         }
         else
@@ -291,6 +295,14 @@ public class HexUIController : MonoBehaviour
     /// 技能按钮点击事件
     /// </summary>
     private void OnAbilityButton_03_ButtonClicked()
+    {
+        currentSelectedTile.ExecuteDebtCollection(DebtCollectionMethod.Quell);
+    }
+
+    /// <summary>
+    /// 技能按钮点击事件
+    /// </summary>
+    private void OnAbilityButton_04_ButtonClicked()
     {
         currentSelectedTile.ExecuteDebtCollection(DebtCollectionMethod.Violent);
     }

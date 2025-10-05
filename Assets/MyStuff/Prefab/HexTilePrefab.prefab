@@ -60,13 +60,25 @@ MonoBehaviour:
   supportLevel: 0.1
   supportLevel_temp: 0.1
   unioLevel: 0
+  LeverageLevel: 0
+  resistanceLevelGrowth: -0.0055555557
+  baseResistanceLevelGrowth: -0.0055555557
+  regionOriginFuns: 1000
+  totalGain: 0
   DebtCollectionMethodCooldown: 30
   currentDebtCollectionMethodCooldown: 0
   neighbors: []
   spriteRenderer: {fileID: 0}
   unlockedColor: {r: 1, g: 1, b: 1, a: 1}
+  cityUnlockedColor: {r: 0.9622642, g: 0.87686664, b: 0.1845851, a: 1}
+  suburbUnlockedColor: {r: 0.8238993, g: 0.48353657, b: 0.16840704, a: 1}
+  ruralUnlockedColor: {r: 0.5920683, g: 0.99371064, b: 0.3656104, a: 1}
+  lakeUnlockedColor: {r: 0.2040465, g: 0.3134444, b: 0.3584906, a: 1}
+  mountainUnlockedColor: {r: 0.19091403, g: 0.30817598, b: 0.23279329, a: 1}
   resistanceColor: {r: 1, g: 0, b: 0, a: 1}
-  lockedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  lockedColor: {r: 0.2264151, g: 0.22570309, b: 0.22570309, a: 1}
+  tileType: 0
+  TileTypeSprites: []
 --- !u!212 &7989409822508056636
 SpriteRenderer:
   m_ObjectHideFlags: 0
