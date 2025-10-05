@@ -179,24 +179,45 @@ public class HexUIController : MonoBehaviour
 
         bool isUnlocked = currentSelectedTile.isUnlocked;
 
+        string tiletext = "";
+        switch(currentSelectedTile.tileType)
+        {
+            case TileType.City:
+                tiletext += "City\n";
+                break;
+            case TileType.Suburb:
+                tiletext += "Suburb\n";
+                break;
+            case TileType.Rural:
+                tiletext += "Rural\n";
+                break;
+            case TileType.Mountain:
+                tiletext += "Mountain\n";
+                break;
+            case TileType.Lake:
+                tiletext += "Lake\n";
+                break;
+        }
+        tiletext += "\n";
+
         // 更新地块信息文本
         if (isUnlocked)
         {
-            tileInfoText.text = $"地块 {currentSelectedTile.tileName}\n"
-                + string.Format("当前收账率:{0:P1}\n", currentSelectedTile.currentCollectionRate)
-                + string.Format("民怨值:{0:F2}\n", currentSelectedTile.resistanceLevel)
-                + string.Format("支持度:{0:F2}\n", currentSelectedTile.supportLevel);
+            tiletext += string.Format("Collection:{0:P1}\n", currentSelectedTile.currentCollectionRate)
+                + string.Format("ResistanceLevel:{0:F2}\n", currentSelectedTile.resistanceLevel)
+                + string.Format("SupportLevel:{0:F2}\n", currentSelectedTile.supportLevel);
+            tileInfoText.text = tiletext;
         }
         else
         {
-            tileInfoText.text = $"地块 {currentSelectedTile.tileName}\n";
+            tileInfoText.text = tiletext;
         }
 
         // 判断是否可解锁，并更新提示
         if (isUnlocked)
         {
             unlockButton.interactable = false;
-            costText.text = "已解锁";
+            costText.text = "Unlocked";
         }
         else
         {
@@ -212,19 +233,23 @@ public class HexUIController : MonoBehaviour
 
             bool enoughFunds = gameManager.currentFunds >= unlockCost;
 
-            if(hasUnlockedNeighbor && enoughFunds)
+            bool isNotObstacle = !currentSelectedTile.isObstacle();
+
+            if (hasUnlockedNeighbor && enoughFunds && isNotObstacle)
             {
                 unlockButton.interactable = true;
                 // 更新成本文本
-                costText.text = $"解锁成本:{unlockCost}";
+                costText.text = $"Lending Cost:{unlockCost}";
             }
             else
             {
                 unlockButton.interactable = false;
-                if (!hasUnlockedNeighbor)
-                    costText.text = $"解锁成本:{unlockCost}(不相邻)";
+                if(!isNotObstacle)
+                    costText.text = $"(Cannot be unlocked)";
+                else if (!hasUnlockedNeighbor)
+                    costText.text = $"Lending Cost:{unlockCost}\n(Not adjacent)";
                 else if(!enoughFunds)
-                    costText.text = $"解锁成本:{unlockCost}(资金不足)";
+                    costText.text = $"Lending Cost:{unlockCost}\n(Insufficient funds)";
             }         
         }
 

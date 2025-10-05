@@ -13,11 +13,12 @@ public enum DebtCollectionMethod
 
 public enum TileType
 {
-    City,       // 城市
-    Suburb,     // 郊区  
-    Rural,      // 农村
-    Lake,       // 湖泊（障碍）
-    Mountain    // 山地（障碍）
+    City = 0,       // 城市
+    Suburb = 1,     // 郊区  
+    Rural = 2,      // 农村
+    Lake = 3,       // 湖泊（障碍）
+    Mountain = 4,   // 山地（障碍）
+    MaxNum = Mountain
 }
 
 public class HexTile : MonoBehaviour
@@ -252,7 +253,7 @@ public class HexTile : MonoBehaviour
         resistanceLevelGrowth = baseResistanceLevelGrowth + LeverageLevel * 7f/8f;
 
         // 反抗度（民怨值）
-        resistanceLevel = Math.Max(resistanceLevel - resistanceLevelGrowth * Time.deltaTime, 0);
+        resistanceLevel = Math.Max(resistanceLevel + resistanceLevelGrowth * Time.deltaTime, 0);
 
         // 支持度
         supportLevel = unioLevel + supportLevel_temp;
