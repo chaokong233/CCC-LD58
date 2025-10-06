@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -35,6 +36,17 @@ public class HexUIController : MonoBehaviour
     public GameObject gameSuccessPanel;
     public Button continueButton;
 
+    [Header("Music")]
+    public AudioSource effect_AudioSource;
+    //public AudioSource audioSource;
+    public List<AudioResource> ability_audio;
+    public AudioResource rebell_audio;
+    public AudioResource recover_audio;
+    public AudioResource warning_audio;
+    public AudioResource click_audio;
+    public AudioResource cancel_audio;
+    public AudioResource unlock_audio;
+
     [Header("解锁设置")]
     public float unlockCost = 100f;
 
@@ -54,7 +66,8 @@ public class HexUIController : MonoBehaviour
         mainCamera = Camera.main;
         gameManager = FindFirstObjectByType<GameManager>();
         mapGenerator = FindFirstObjectByType<HexMapGenerator>();
-        
+        effect_AudioSource = gameObject.AddComponent<AudioSource>();
+
         // 绑定按钮事件
         unlockButton.onClick.AddListener(OnUnlockButtonClicked);
 
@@ -399,6 +412,7 @@ public class HexUIController : MonoBehaviour
     private void OnAbilityButton_01_ButtonClicked()
     {
         currentSelectedTile.ExecuteDebtCollection(DebtCollectionMethod.Gentle);
+        PlaySound(ability_audio[0]);
     }
 
     /// <summary>
@@ -407,6 +421,7 @@ public class HexUIController : MonoBehaviour
     private void OnAbilityButton_02_ButtonClicked()
     {
         currentSelectedTile.ExecuteDebtCollection(DebtCollectionMethod.Legal);
+        PlaySound(ability_audio[1]);
     }
 
     /// <summary>
@@ -415,6 +430,7 @@ public class HexUIController : MonoBehaviour
     private void OnAbilityButton_03_ButtonClicked()
     {
         currentSelectedTile.ExecuteDebtCollection(DebtCollectionMethod.Quell);
+        PlaySound(ability_audio[2]);
     }
 
     /// <summary>
@@ -423,6 +439,7 @@ public class HexUIController : MonoBehaviour
     private void OnAbilityButton_04_ButtonClicked()
     {
         currentSelectedTile.ExecuteDebtCollection(DebtCollectionMethod.Violent);
+        PlaySound(ability_audio[3]);
     }
 
     /// <summary>
@@ -431,6 +448,7 @@ public class HexUIController : MonoBehaviour
     private void OnAbilityButton_05_ButtonClicked()
     {
         currentSelectedTile.ExecuteQuell(QuellMethod.CalmDown);
+        PlaySound(ability_audio[4]);
     }
 
     /// <summary>
@@ -439,6 +457,13 @@ public class HexUIController : MonoBehaviour
     private void OnAbilityButton_06_ButtonClicked()
     {
         currentSelectedTile.ExecuteQuell(QuellMethod.Permeation);
+        PlaySound(ability_audio[5]);  
+    }
+
+    public void PlaySound(AudioResource resource)
+    {
+        effect_AudioSource.resource = resource;
+        effect_AudioSource.Play();
     }
 
     /// <summary>
@@ -456,6 +481,7 @@ public class HexUIController : MonoBehaviour
     /// </summary>
     private void PauseGame()
     {
+        OnPlayClickSound();
         pausePanel.SetActive(true);
         Time.timeScale = 0;
     }
@@ -465,6 +491,7 @@ public class HexUIController : MonoBehaviour
     /// </summary>
     private void ResumeGame()
     {
+        OnPlayCancelSound();
         pausePanel.SetActive(false);
         Time.timeScale = speedSlider.value;
     }
@@ -498,8 +525,39 @@ public class HexUIController : MonoBehaviour
     /// </summary>
     public void OnGameSuccess()
     {
+        OnPlayClickSound();
         gameSuccessPanel.SetActive(true);
         Time.timeScale = 0;
+    }
+
+    public void OnTileRebell()
+    {
+        PlaySound(rebell_audio);
+    }
+
+    public void OnTileRecover()
+    {
+        PlaySound(recover_audio);
+    }
+
+    public void OnTileWanring()
+    {
+        PlaySound(warning_audio);
+    }
+
+    public void OnPlayClickSound()
+    {
+        PlaySound(click_audio);
+    }
+
+    public void OnPlayCancelSound()
+    {
+        PlaySound(cancel_audio);
+    }
+
+    public void OnUnlockTile()
+    {
+        PlaySound(unlock_audio);
     }
 
     /// <summary>

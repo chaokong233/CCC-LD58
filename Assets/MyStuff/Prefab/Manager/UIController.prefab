@@ -49,12 +49,27 @@ MonoBehaviour:
   tileInfoText: {fileID: 0}
   costText: {fileID: 0}
   fundsText: {fileID: 0}
-  AbilityPanel: {fileID: 0}
+  AbilityPanel_normal: {fileID: 0}
   AbilityButton_01: {fileID: 0}
   AbilityButton_02: {fileID: 0}
   AbilityButton_03: {fileID: 0}
   AbilityButton_04: {fileID: 0}
+  cd_texts: []
+  AbilityPanel_quell: {fileID: 0}
+  AbilityButton_05: {fileID: 0}
+  AbilityButton_06: {fileID: 0}
+  pausePanel: {fileID: 0}
+  returnToGameButton: {fileID: 0}
+  returnToMenuButton: {fileID: 0}
+  speedSlider: {fileID: 0}
+  speedText: {fileID: 0}
+  gameSuccessPanel: {fileID: 0}
+  continueButton: {fileID: 0}
+  audioSource: {fileID: 0}
+  ability_audio:
+  - {fileID: 0}
   unlockCost: 100
   panelOffset: {x: 0, y: 20}
   screenRLMargin: 20
   screenUpMargin: 320
+  currentSelectedTile: {fileID: 0}

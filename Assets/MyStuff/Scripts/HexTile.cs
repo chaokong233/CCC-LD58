@@ -50,6 +50,7 @@ public class HexTile : MonoBehaviour
     public float targetCollectionRate = 0.3f; // 目标收账率 0-1
 
     public float resistanceLevel = 0.1f; // 反抗度 0-1
+    public float last_resistanceLevel = 0.1f; // 反抗度 0-1
     public float supportLevel = 0.0f; // 支持度 0-1
     public float supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
     public float unioLevel = 0.0f; // 联结度 0-1(用解锁百分比代替)
@@ -66,8 +67,9 @@ public class HexTile : MonoBehaviour
 
     private GameManager gameManager_;
     private HexMapGenerator mapGenerator_;
+    private HexUIController uiController_;
     private FloatingTextController floatingTextController_;
-
+    
     [Header("相邻地块")]
     public List<HexTile> neighbors = new List<HexTile>();
 
@@ -137,6 +139,8 @@ public class HexTile : MonoBehaviour
             mapGenerator_ = FindFirstObjectByType<HexMapGenerator>();
         if (floatingTextController_ == null)
             floatingTextController_ = FindFirstObjectByType<FloatingTextController>();
+        if (uiController_ == null)
+            uiController_ = FindFirstObjectByType<HexUIController>();      
     }
 
     private void Start()
@@ -268,6 +272,7 @@ public class HexTile : MonoBehaviour
         {
             isUnlocked = true;
             UpdateVisuals();
+            uiController_.OnUnlockTile();
             Debug.Log($"地块 {tileName} 已解锁");
         }
     }
@@ -303,7 +308,7 @@ public class HexTile : MonoBehaviour
             case DebtCollectionMethod.Violent:
                 currentCollectionRate = Math.Max(1.20f, currentCollectionRate);
                 supportLevel_temp += -0.05f;
-                resistanceLevel += 0.30f;
+                resistanceLevel += 0.50f;
                 break;
         }
     }
@@ -352,6 +357,9 @@ public class HexTile : MonoBehaviour
             OnBeRebelContinent();
             resistanceLevel = 1;
         }
+        if (resistanceLevel > 0.9 && last_resistanceLevel < 0.9)
+            On90Warning();
+        last_resistanceLevel = resistanceLevel;
 
         // 支持度
         supportLevel = Math.Clamp(unioLevel * unioLevelFractor + supportLevel_temp, 0, 1);
@@ -362,6 +370,11 @@ public class HexTile : MonoBehaviour
         // 当前收账率
         float alpha = collectionRestitutionFactor * Time.deltaTime;
         currentCollectionRate = Mathf.Lerp(currentCollectionRate, targetCollectionRate, alpha);
+    }
+
+    private void On90Warning()
+    {
+         uiController_.OnTileWanring();
     }
 
     /// <summary>
@@ -424,6 +437,7 @@ public class HexTile : MonoBehaviour
         isCalmedDown = false;
         isRebelContinent = true;
         floatingTextController_.ShowText(transform.position, "Rebel!", new Color(1f, 0.1f, 0.1f, 1f));
+        uiController_.OnTileRebell();
     }
 
     /// <summary>
@@ -431,6 +445,8 @@ public class HexTile : MonoBehaviour
     /// </summary>
     private void OnRecoverRebel()
     {
+        uiController_.OnTileRecover();
+
         // 重置属性参数
         currentCollectionCooldown = 1.0f; // 当前CD
 
