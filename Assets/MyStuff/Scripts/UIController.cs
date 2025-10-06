@@ -154,7 +154,8 @@ public class HexUIController : MonoBehaviour
         if (hexPanel != null)
         {       
             hexPanel.SetActive(true);
-            SetUnlockCost(mapGenerator.GetTileCostAtCoord(currentSelectedTile.q, currentSelectedTile.r));
+            if(!currentSelectedTile.isObstacle())
+                SetUnlockCost(mapGenerator.GetTileCostAtCoord(currentSelectedTile.q, currentSelectedTile.r));
 
             // 更新面板位置（确保在屏幕内）
             UpdatePanelPosition(tile.transform.position);

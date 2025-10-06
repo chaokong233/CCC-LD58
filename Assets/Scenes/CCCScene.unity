@@ -1108,7 +1108,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &470187030
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1141,14 +1141,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.666904, g: 0.6968637, b: 0.754717, a: 1}
+  m_Color: {r: 0.98742133, g: 0.73956233, b: 0.69243693, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -5512419710938922105, guid: 392b0fc55c99f044aa3b4fb6094fa4a4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2102,7 +2102,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &838911421
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3367,7 +3367,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1188849657
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3476,7 +3476,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1247422446
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4875,7 +4875,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1695182817
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4908,14 +4908,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7489735, g: 0.7798742, b: 0.7381828, a: 1}
+  m_Color: {r: 0.78084147, g: 0.8616352, b: 0.75054383, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 2597996580673615598, guid: baccc76f12203004ca0e91b1e2022835, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4950,7 +4950,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1815046575
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4983,14 +4983,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.666904, g: 0.6968637, b: 0.754717, a: 1}
+  m_Color: {r: 0.83458054, g: 0.84276724, b: 0.6334005, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 411320293596959682, guid: ff43b5067f01f214baa1dea63515f9e0, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7066,6 +7066,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: AbilityButton_01
       objectReference: {fileID: 0}
+    - target: {fileID: 3308707512874259710, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1608243994170670139, guid: 5148272fd076f3548907e7207524c09c, type: 3}
+    - target: {fileID: 3308707512874259710, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: m_Color.b
+      value: 0.9559748
+      objectReference: {fileID: 0}
+    - target: {fileID: 3308707512874259710, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: m_Color.g
+      value: 0.94867903
+      objectReference: {fileID: 0}
+    - target: {fileID: 3308707512874259710, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: m_Color.r
+      value: 0.8086705
+      objectReference: {fileID: 0}
     - target: {fileID: 3999912981298997375, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -7161,6 +7177,10 @@ PrefabInstance:
     - target: {fileID: 6166697613044514666, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
       propertyPath: attributeText
       value: 'CollectionRate: 80%\nResistanceLevel: +5%\nSupportLevel: +12% '
+      objectReference: {fileID: 0}
+    - target: {fileID: 8327731704789991529, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
