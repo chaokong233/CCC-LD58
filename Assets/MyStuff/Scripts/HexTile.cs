@@ -230,23 +230,23 @@ public class HexTile : MonoBehaviour
                 break;
             case TileType.Suburb:
                 debtCost = 200.0f; // 初次借贷价格
-                baseCollectionValue = 24.0f; // 基础产出值
+                baseCollectionValue = 22.0f; // 基础产出值
                 baseCollectionRate = 0.2f; // 基础收账率 0-1
                 resistanceLevel = 0.1f; // 反抗度 0-1
                 supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
                 unioLevelFractor = 0.5f; // 联结度影响因子
                 baseResistanceLevelGrowth = -0.0025f; // 初始反抗度自然增长
-                regionOriginFuns = 800.0f; // 地区原始资金
+                regionOriginFuns = 9000.0f; // 地区原始资金
                 break;
             case TileType.City:
                 debtCost = 1000.0f; // 初次借贷价格
-                baseCollectionValue = 120f; // 基础产出值
+                baseCollectionValue = 100f; // 基础产出值
                 baseCollectionRate = 0.1f; // 基础收账率 0-1
                 resistanceLevel = 0.1f; // 反抗度 0-1
                 supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
                 unioLevelFractor = 0.4f; // 联结度影响因子
                 baseResistanceLevelGrowth = -0.001f; // 初始反抗度自然增长
-                regionOriginFuns = 5000.0f; // 地区原始资金
+                regionOriginFuns = 7000.0f; // 地区原始资金
                 break;
             case 0:
                 break;
@@ -287,7 +287,7 @@ public class HexTile : MonoBehaviour
         {
             case DebtCollectionMethod.Gentle:
                 currentCollectionRate = Math.Max(0.80f, currentCollectionRate);
-                supportLevel_temp += 0.10f;
+                supportLevel_temp += 0.12f;
                 resistanceLevel += 0.05f;
                 break;
             case DebtCollectionMethod.Legal:
@@ -297,7 +297,7 @@ public class HexTile : MonoBehaviour
                 break;
             case DebtCollectionMethod.Quell:
                 currentCollectionRate = Math.Max(0.60f, currentCollectionRate);
-                supportLevel_temp += 0.08f;
+                supportLevel_temp += 0.1f;
                 resistanceLevel += -0.60f;
                 break;
             case DebtCollectionMethod.Violent:
@@ -338,7 +338,7 @@ public class HexTile : MonoBehaviour
         LeverageLevel = totalGain / (regionOriginFuns + totalGain * Mathf.Max(1f, 2.5f - gameManager_.currentTime * 0.2f / 60f));
 
         float LeverageLevelMutiplier = 0.0389f;
-        float supportLevelLevelMutiplier = -0.032f;
+        float supportLevelLevelMutiplier = -0.028f;
         // 反抗度（民怨值）自然增长
         resistanceLevelGrowth = baseResistanceLevelGrowth + LeverageLevel * LeverageLevelMutiplier + supportLevel * supportLevelLevelMutiplier;
 
@@ -438,7 +438,7 @@ public class HexTile : MonoBehaviour
 
         resistanceLevel = 0.1f; // 反抗度 0-1
         supportLevel = 0.1f; // 支持度 0-1
-        supportLevel_temp = 0.5f; // 不受联结度影响前的支持度
+        supportLevel_temp = 0.2f; // 不受联结度影响前的支持度
 
         totalGain = 0f; // 总收益资金
     }

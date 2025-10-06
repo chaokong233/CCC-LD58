@@ -340,7 +340,7 @@ public class HexUIController : MonoBehaviour
                 AbilityPanel_quell.SetActive(true);
 
                 AbilityButton_05.interactable = !isCalmedDown && gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)QuellMethod.CalmDown];
-                AbilityButton_06.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)QuellMethod.Permeation];
+                AbilityButton_06.interactable = isCalmedDown && gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)QuellMethod.Permeation];
             }
             else
             {
