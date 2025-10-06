@@ -33,6 +33,8 @@ public class HexMapGenerator : MonoBehaviour
     public List<int> unlockedTileTypeCounter = new List<int>(((int)TileType.MaxNum)+1);
 
     private Dictionary<Vector2Int, HexTile> hexMap = new Dictionary<Vector2Int, HexTile>();
+    [HideInInspector]
+    public Dictionary<Vector2Int, HexTile> cityTiles = new Dictionary<Vector2Int, HexTile>();
     private List<HexTile> allTiles = new List<HexTile>();
     private System.Random random;
 
@@ -58,6 +60,7 @@ public class HexMapGenerator : MonoBehaviour
             random = new System.Random(System.DateTime.Now.Millisecond);
 
             hexMap.Clear();
+            cityTiles.Clear();
             foreach (var item in allTiles)
             {
                 Destroy(item.gameObject);
@@ -87,6 +90,10 @@ public class HexMapGenerator : MonoBehaviour
 
             foreach (var tile in hexMap)
             {
+                if (tile.Value.tileType == TileType.City)
+                {
+                    cityTiles.Add(tile.Key, tile.Value);
+                }
                 tileTypeCounter[(int)tile.Value.tileType]++;
             }
 

@@ -1,21 +1,20 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public enum DebtCollectionMethod
 {
-    None=0,
-    Gentle=1,     // 温和催债
-    Legal=2,      // 法律催债
-    Quell=3,      // 平息
-    Violent=4     // 暴力讨债
+    None = 0,
+    Gentle = 1,     // 温和催债
+    Legal = 2,      // 法律催债
+    Quell = 3,      // 平息
+    Violent = 4     // 暴力讨债
 }
 
 public enum QuellMethod
 {
-    CalmDown = 5,     // 温和催债
-    Permeation = 6,      // 法律催债
+    CalmDown = 5,     // 
+    Permeation = 6,      // 
 }
 
 public enum TileType
@@ -43,22 +42,23 @@ public class HexTile : MonoBehaviour
     public float debtCost = 100.0f; // 初次借贷价格
 
     public float collectionCooldown = 8.0f; // 产出CD
-    private float currentCollectionCooldown = 8.0f; // 当前CD
+    public float currentCollectionCooldown = 8.0f; // 当前CD
 
-    public float baseCollectionValue = 15.0f; // 基础产出值
-    public float currentCollectionRate = 1.0f; // 当前收账率 0-1
-    public float baseCollectionRate = 0.8f; // 基础收账率 0-1
-    public float targetCollectionRate = 1f; // 目标收账率 0-1
+    public float baseCollectionValue = 8.0f; // 基础产出值
+    public float currentCollectionRate = 0.8f; // 当前收账率 0-1
+    public float baseCollectionRate = 0.3f; // 基础收账率 0-1
+    public float targetCollectionRate = 0.3f; // 目标收账率 0-1
 
-    public float resistanceLevel = 0.3f; // 反抗度 0-1
-    public float supportLevel = 0.1f; // 支持度 0-1
-    public float supportLevel_temp = 0.1f; // 不受联结度影响前的支持度
+    public float resistanceLevel = 0.1f; // 反抗度 0-1
+    public float supportLevel = 0.0f; // 支持度 0-1
+    public float supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
     public float unioLevel = 0.0f; // 联结度 0-1(用解锁百分比代替)
+    public float unioLevelFractor = 0.5f; // 联结度乘数 0-1
     public float LeverageLevel = 0.0f; // 杠杆值 0-1
 
-    public float resistanceLevelGrowth = -1f / 180f; // 反抗度自然增长
-    public float baseResistanceLevelGrowth = -1f / 180f; // 初始反抗度自然增长
-    public float regionOriginFuns = 1000.0f; // 地区原始资金
+    public float resistanceLevelGrowth = -0.35f / 90f; // 反抗度自然增长
+    public float baseResistanceLevelGrowth = -0.35f / 90f; // 初始反抗度自然增长
+    public float regionOriginFuns = 420.0f; // 地区原始资金
     public float totalGain = 0f; // 总收益资金
 
     public float DebtCollectionMethodCooldown = 30.0f; // 催债方式CD
@@ -86,8 +86,8 @@ public class HexTile : MonoBehaviour
     [Header("TileType")]
     public TileType tileType = TileType.City;
 
-    [Header(    "0.default 1.City 2.Suburb 3.Rural 4.Lake 5.Mountain")]
-    public Sprite[] TileTypeSprites = {};
+    [Header("0.default 1.City 2.Suburb 3.Rural 4.Lake 5.Mountain")]
+    public Sprite[] TileTypeSprites = { };
 
     // 六边形方向向量 (Q, R 坐标)，对于q为偶数的tile
     private static readonly Vector2Int[] hexDirections_01 =
@@ -111,21 +111,18 @@ public class HexTile : MonoBehaviour
         new Vector2Int(-1, -1)   // 左下
     };
 
-    // 技能消耗
-    public static readonly float[] abilityCost = 
+    // 技能消耗, 第一个索引是tileType号，第二个索引是技能号
+    public static readonly float[,] abilityCost = new float[4, 7]
     {
-        0,
-        5f,
-        25f,
-        20f,
-        0f,
-
-        150f,
-        300f
+        {0,0,0,0,0,0,0},
+        {0,     120f,150f,300f,50f,   2000f,1200f},
+        {0,     30f,40f,70f,10f,      600f,400f},
+        {0,     15f,20f,35f,0f,       300f,200f}
     };
 
-    private static readonly float collectionRestitutionFactor = 1f / (3f * 8.0f);
-    
+    private static readonly float collectionRestitutionFactor = 1f / 60f;
+    private static readonly float rebelContinentLerpFactor = 0.05f;
+
     private void Awake()
     {
         if (spriteRenderer == null)
@@ -145,9 +142,9 @@ public class HexTile : MonoBehaviour
 
     private void Update()
     {
-        if(isUnlocked)
+        if (isUnlocked)
         {
-            if(!isRebelContinent)
+            if (!isRebelContinent)
             {
                 if (currentDebtCollectionMethodCooldown > 0)
                     currentDebtCollectionMethodCooldown -= Time.deltaTime;
@@ -156,7 +153,7 @@ public class HexTile : MonoBehaviour
             }
             else
             {
-                if(!isCalmedDown)
+                if (!isCalmedDown)
                     UpdateRebelContinent();
                 currentDebtCollectionMethodCooldown = 0;
             }
@@ -213,6 +210,44 @@ public class HexTile : MonoBehaviour
                 unlockedColor = lakeUnlockedColor;
                 break;
         }
+
+        // Initialize TileType Attribute
+        switch (type)
+        {
+            case TileType.Rural:
+                debtCost = 100.0f; // 初次借贷价格
+                baseCollectionValue = 8.0f; // 基础产出值
+                baseCollectionRate = 0.3f; // 基础收账率 0-1
+                resistanceLevel = 0.1f; // 反抗度 0-1
+                supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
+                unioLevelFractor = 0.55f; // 联结度影响因子
+                baseResistanceLevelGrowth = -0.3f / 90f; // 初始反抗度自然增长
+                regionOriginFuns = 380.0f; // 地区原始资金
+                break;
+            case TileType.Suburb:
+                debtCost = 200.0f; // 初次借贷价格
+                baseCollectionValue = 20.0f; // 基础产出值
+                baseCollectionRate = 0.2f; // 基础收账率 0-1
+                resistanceLevel = 0.1f; // 反抗度 0-1
+                supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
+                unioLevelFractor = 0.3f; // 联结度影响因子
+                baseResistanceLevelGrowth = -0.0025f; // 初始反抗度自然增长
+                regionOriginFuns = 8000.0f; // 地区原始资金
+                break;
+            case TileType.City:
+                debtCost = 1000.0f; // 初次借贷价格
+                baseCollectionValue = 80f; // 基础产出值
+                baseCollectionRate = 0.1f; // 基础收账率 0-1
+                resistanceLevel = 0.1f; // 反抗度 0-1
+                supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
+                unioLevelFractor = 0.1f; // 联结度影响因子
+                baseResistanceLevelGrowth = -0.001f; // 初始反抗度自然增长
+                regionOriginFuns = 5000.0f; // 地区原始资金
+                break;
+            case 0:
+                break;
+        }
+
     }
 
     public bool isObstacle()
@@ -242,34 +277,29 @@ public class HexTile : MonoBehaviour
 
         currentDebtCollectionMethodCooldown = DebtCollectionMethodCooldown; // 冷却
 
-        gameManager_.Spending(abilityCost[(int)method]); // Cost
+        gameManager_.Spending(abilityCost[(int)tileType, (int)method]); // Cost
 
         switch (method)
         {
-            //case DebtCollectionMethod.Violent:
-            //    baseCollection = 0.7f;
-            //    resistanceChange = 0.4f;
-            //    break;
-            //case DebtCollectionMethod.Gentle:
-            //    baseCollection = 0.3f;
-            //    resistanceChange = -0.1f;
-            //    break;
-            //case DebtCollectionMethod.Legal:
-            //    baseCollection = 0.5f;
-            //    resistanceChange = 0.1f;
-            //    break;
             case DebtCollectionMethod.Gentle:
-                
+                currentCollectionRate = Math.Max(0.80f, currentCollectionRate);
+                supportLevel_temp += 0.10f;
+                resistanceLevel += 0.05f;
                 break;
             case DebtCollectionMethod.Legal:
-
+                currentCollectionRate = Math.Max(1.00f, currentCollectionRate);
+                supportLevel_temp += 0.03f;
+                resistanceLevel += 0.15f;
                 break;
             case DebtCollectionMethod.Quell:
-
+                currentCollectionRate = Math.Max(0.60f, currentCollectionRate);
+                supportLevel += 0.08f;
+                resistanceLevel += -0.60f;
                 break;
             case DebtCollectionMethod.Violent:
-
-                resistanceLevel += 1f;
+                currentCollectionRate = Math.Max(1.20f, currentCollectionRate);
+                supportLevel_temp += -0.05f;
+                resistanceLevel += 0.30f;
                 break;
         }
     }
@@ -281,7 +311,7 @@ public class HexTile : MonoBehaviour
     {
         if (!isRebelContinent) return;
 
-        gameManager_.Spending(abilityCost[(int)method]); // Cost
+        gameManager_.Spending(abilityCost[(int)tileType, (int)method]); // Cost
 
         switch (method)
         {
@@ -298,30 +328,36 @@ public class HexTile : MonoBehaviour
     private void UpdateAttribute()
     {
         // 联结度（简单用解锁百分比代替）
-        unioLevel = 0.8f * (float)(mapGenerator_.unlockedTileTypeCounter[(int)tileType]) / (float)(mapGenerator_.tileTypeCounter[(int)tileType]);
+        unioLevel = (float)(mapGenerator_.unlockedTileTypeCounter[(int)tileType]) / (float)(mapGenerator_.tileTypeCounter[(int)tileType]);
 
-        // 杠杆
-        LeverageLevel = totalGain / (regionOriginFuns + totalGain);
+        // 杠杆, 时间乘数
+        LeverageLevel = totalGain / (regionOriginFuns + totalGain * Mathf.Max(1f, 2f - gameManager_.currentTime * 0.2f / 60f));
 
+        float LeverageLevelMutiplier = 0.0487f;
+        float supportLevelLevelMutiplier = -0.033f;
         // 反抗度（民怨值）自然增长
-        resistanceLevelGrowth = baseResistanceLevelGrowth + LeverageLevel * 1f/8f;
+        resistanceLevelGrowth = baseResistanceLevelGrowth + LeverageLevel * LeverageLevelMutiplier + supportLevel * supportLevelLevelMutiplier;
 
         // 反抗度（民怨值）
-        resistanceLevel = Math.Max(resistanceLevel + resistanceLevelGrowth * Time.deltaTime, 0);
+        // remap: 60~100 -> 1~0.8, 民怨值较高时，减缓增长
+        float resistanceLevelMutiplier = resistanceLevelGrowth < 0.6 ? 1.0f : Mathf.Lerp(1f, 0.7f, (resistanceLevel - 0.6f) / 0.4f);
+        resistanceLevel = Math.Max(resistanceLevel + resistanceLevelGrowth * resistanceLevelMutiplier * Time.deltaTime, 0);
         // 反抗度满时，成为反抗地区
         if (resistanceLevel >= 1)
-            OnBeRebelContinent();       
+        {
+            OnBeRebelContinent();
+            resistanceLevel = 1;
+        }
 
         // 支持度
-        supportLevel = Math.Clamp(unioLevel + supportLevel_temp, 0, 1);
+        supportLevel = Math.Clamp(unioLevel * unioLevelFractor + supportLevel_temp, 0, 1);
 
         // 目标收账率
         targetCollectionRate = Math.Clamp(baseCollectionRate + supportLevel - resistanceLevel, 0, 1);
 
         // 当前收账率
         float alpha = collectionRestitutionFactor * Time.deltaTime;
-        currentCollectionRate = currentCollectionRate * (1f - alpha) + targetCollectionRate * alpha;
-
+        currentCollectionRate = Mathf.Lerp(currentCollectionRate, targetCollectionRate, alpha);
     }
 
     /// <summary>
@@ -344,7 +380,7 @@ public class HexTile : MonoBehaviour
             // Reset CD
             currentCollectionCooldown += collectionCooldown;
         }
-        
+
     }
 
     /// <summary>
@@ -366,10 +402,11 @@ public class HexTile : MonoBehaviour
                 Color targetColor = Color.Lerp(baseColor, resistanceColor, 0.9f);
                 spriteRenderer.color = targetColor;
             }
-            else { 
+            else
+            {
                 // 根据民怨度混合颜色
                 Color baseColor = unlockedColor;
-                Color targetColor = Color.Lerp(baseColor, resistanceColor, Math.Max(resistanceLevel-0.2f,0f)*0.8f);
+                Color targetColor = Color.Lerp(baseColor, resistanceColor, Math.Max(resistanceLevel - 0.2f, 0f) * 0.8f);
                 spriteRenderer.color = targetColor;
             }
         }
@@ -403,13 +440,14 @@ public class HexTile : MonoBehaviour
     }
 
     /// <summary>
-    /// 反抗地区
+    /// 反抗地区影响周围
     /// </summary>
     private void UpdateRebelContinent()
     {
+        float alpha = rebelContinentLerpFactor * Time.deltaTime;
         foreach (var tile in neighbors)
         {
-            tile.resistanceLevel += 0.01f * Time.deltaTime;
+            tile.resistanceLevel = Mathf.Lerp(tile.resistanceLevel, 1f, alpha);
         }
     }
 

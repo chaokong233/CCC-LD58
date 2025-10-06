@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HexUIController : MonoBehaviour
@@ -19,9 +21,19 @@ public class HexUIController : MonoBehaviour
     public Button AbilityButton_02;
     public Button AbilityButton_03;
     public Button AbilityButton_04;
+    public List<TextMeshProUGUI> cd_texts = new List<TextMeshProUGUI>();
     public GameObject AbilityPanel_quell;
     public Button AbilityButton_05;
     public Button AbilityButton_06;
+    [Header("   Pause")]
+    public GameObject pausePanel;
+    public Button returnToGameButton;
+    public Button returnToMenuButton;
+    public Slider speedSlider;
+    public TextMeshProUGUI speedText;
+    [Header("   GameSuccess")]
+    public GameObject gameSuccessPanel;
+    public Button continueButton;
 
     [Header("解锁设置")]
     public float unlockCost = 100f;
@@ -31,27 +43,30 @@ public class HexUIController : MonoBehaviour
     public float screenRLMargin = 20f; // 屏幕边距
     public float screenUpMargin = 150f; // 屏幕边距
 
-    private HexTile currentSelectedTile;
+    public HexTile currentSelectedTile;
     private GameManager gameManager;
     private Camera mainCamera;
     private RectTransform panelRectTransform;
 
-    private float currentTime_ = 0;
-
     void Start()
     {
-        currentTime_ = 0;
         mainCamera = Camera.main;
         gameManager = FindFirstObjectByType<GameManager>();
 
         // 绑定按钮事件
         unlockButton.onClick.AddListener(OnUnlockButtonClicked);
+
         AbilityButton_01.onClick.AddListener(OnAbilityButton_01_ButtonClicked);
         AbilityButton_02.onClick.AddListener(OnAbilityButton_02_ButtonClicked);
         AbilityButton_03.onClick.AddListener(OnAbilityButton_03_ButtonClicked);
         AbilityButton_04.onClick.AddListener(OnAbilityButton_04_ButtonClicked);
         AbilityButton_05.onClick.AddListener(OnAbilityButton_05_ButtonClicked);
         AbilityButton_06.onClick.AddListener(OnAbilityButton_06_ButtonClicked);
+
+        returnToGameButton.onClick.AddListener(OnReturnToGameButtonClicked);
+        returnToMenuButton.onClick.AddListener(OnReturnToMenuButtonClicked);
+
+        continueButton.onClick.AddListener(OnGameSuccessContinueButtonClicked);
 
         // AbilityButton_01.
 
@@ -63,12 +78,17 @@ public class HexUIController : MonoBehaviour
         if (hexPanel != null)
             hexPanel.SetActive(false);
 
+        // 初始隐藏面板
+        if (pausePanel != null)
+            pausePanel.SetActive(false);
+
+        // 初始隐藏面板
+        if (gameSuccessPanel != null)
+            gameSuccessPanel.SetActive(false);
     }
 
     void Update()
     {
-        currentTime_ += Time.deltaTime;
-
         // 检测鼠标点击 // 检查是否点击在UI上
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
@@ -82,13 +102,21 @@ public class HexUIController : MonoBehaviour
         // 更新资金显示
         if (gameManager != null && fundsText != null)
         {
-            fundsText.text = $"Fund: {gameManager.currentFunds:F0}\nTime: {currentTime_/60:F0}min{currentTime_%60:F1}s";
+            float currentTime = gameManager.currentTime;
+            fundsText.text = $"Fund: {gameManager.currentFunds:F0}\nTime: {currentTime/60:F0}min{currentTime%60:F1}s";
         }
 
         // 按ESC关闭面板
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            HidePanel();
+            if (hexPanel.activeSelf)
+                HidePanel();
+            else if (pausePanel.activeSelf)
+            {
+                ResumeGame();
+            }
+            else
+                PauseGame();
         }
     }
 
@@ -188,43 +216,42 @@ public class HexUIController : MonoBehaviour
 
         bool isUnlocked = currentSelectedTile.isUnlocked;
         bool isNotRebel = !currentSelectedTile.isRebelContinent;
+        bool isCalmedDown = currentSelectedTile.isCalmedDown;
+        TileType tileType = currentSelectedTile.tileType;
 
         string tiletext = "";
-        switch(currentSelectedTile.tileType)
+        string rebelLable = isNotRebel ? "\n" : "(Rebel)\n";
+        string cityLable = isUnlocked ? "" : "Prosperous but Hard-to-Control Region\n\n";
+        string suburbLable = isUnlocked ? "" : "Relatively Prosperous Region\n\n";
+        string ruralLable = isUnlocked ? "" : "Average Region\n\n";
+
+        switch (currentSelectedTile.tileType)
         {
             case TileType.City:
-                tiletext += "City";
+                tiletext += "City"+ rebelLable + cityLable;
                 break;
             case TileType.Suburb:
-                tiletext += "Suburb";
+                tiletext += "Suburb" + rebelLable + suburbLable;
                 break;
             case TileType.Rural:
-                tiletext += "Rural";
+                tiletext += "Rural" + rebelLable + ruralLable;
                 break;
             case TileType.Mountain:
-                tiletext += "Mountain";
+                tiletext += "Mountain" + rebelLable + "It's a terrain obstacle.";
                 break;
             case TileType.Lake:
-                tiletext += "Lake";
+                tiletext += "Lake" + rebelLable + "It's a terrain obstacle.";
                 break;
         }
-        if(isNotRebel)
-        {
-            tiletext += "\n";
-        }
-        else
-        {
-            tiletext += "(Rebel)\n"; 
-        }
-        tiletext += "\n";
 
         // 更新地块信息文本
         if (isUnlocked && isNotRebel)
         {
             tiletext += string.Format("Collection:{0:P1}\n", currentSelectedTile.currentCollectionRate)
-                + string.Format("ResistanceLevel:{0:F2}\n", currentSelectedTile.resistanceLevel)
-                + string.Format("SupportLevel:{0:F2}\n", currentSelectedTile.supportLevel)
-                + string.Format("LeverageLevel:{0:P1}\n", currentSelectedTile.LeverageLevel);
+                + string.Format("ResistanceLevel:{0:P1}\n\n", currentSelectedTile.resistanceLevel)
+                + string.Format("SupportLevel:{0:P1}\n", currentSelectedTile.supportLevel)
+                + string.Format("LeverageLevel:{0:P1}\n", currentSelectedTile.LeverageLevel)
+                + string.Format("UnionLevel:{0:P1}\n", currentSelectedTile.unioLevel);
             tileInfoText.text = tiletext;
         }
         else
@@ -232,6 +259,10 @@ public class HexUIController : MonoBehaviour
             if(!isNotRebel)
             {
                 tiletext += "the tile rebel\nCost to Quell it";
+            }
+            else if(!isUnlocked)
+            {
+                tiletext += $"One-Time Income:{currentSelectedTile.baseCollectionValue}\nIncome Cooldown:{currentSelectedTile.currentCollectionCooldown}";
             }
             tileInfoText.text = tiletext;
         }
@@ -280,16 +311,19 @@ public class HexUIController : MonoBehaviour
         if (isUnlocked && isNotRebel)
         {
             AbilityPanel_normal.SetActive(true);
-            bool isAbilityAvaible = currentSelectedTile.currentDebtCollectionMethodCooldown <= 0;
+            float current_cd = currentSelectedTile.currentDebtCollectionMethodCooldown;
+            bool isAbilityAvaible = current_cd <= 0;
             if(isAbilityAvaible)
             {
-                AbilityButton_01.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Gentle];
-                AbilityButton_02.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Legal];
-                AbilityButton_03.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Quell];
-                AbilityButton_04.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Violent];
+                ShowCdText(false);
+                AbilityButton_01.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)DebtCollectionMethod.Gentle];
+                AbilityButton_02.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)DebtCollectionMethod.Legal];
+                AbilityButton_03.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)DebtCollectionMethod.Quell];
+                AbilityButton_04.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)DebtCollectionMethod.Violent];
             }
             else
             {
+                ShowCdText(true, current_cd);
                 AbilityButton_01.interactable = false;
                 AbilityButton_02.interactable = false;
                 AbilityButton_03.interactable = false;
@@ -302,8 +336,9 @@ public class HexUIController : MonoBehaviour
             if(!isNotRebel)
             {
                 AbilityPanel_quell.SetActive(true);
-                AbilityButton_05.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)QuellMethod.CalmDown];
-                AbilityButton_06.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)QuellMethod.Permeation];
+
+                AbilityButton_05.interactable = !isCalmedDown && gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)QuellMethod.CalmDown];
+                AbilityButton_06.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)QuellMethod.Permeation];
             }
             else
             {
@@ -323,6 +358,16 @@ public class HexUIController : MonoBehaviour
         //button.onPointerExit.AddListener(OnPointerExit);
     }
 
+    /// <summary>
+    /// cd_text
+    /// </summary>
+    private void ShowCdText(bool show_or_hide, float cd = 0f)
+    {
+        foreach (var text in cd_texts)
+        {
+            text.text = show_or_hide ? $"{cd:F1}s" : "";
+        }
+    }
 
     /// <summary>
     /// 解锁按钮点击事件
@@ -401,4 +446,66 @@ public class HexUIController : MonoBehaviour
         unlockCost = cost;
         UpdatePanelInfo();
     }
+
+
+    /// <summary>
+    /// 暂停游戏
+    /// </summary>
+    private void PauseGame()
+    {
+        pausePanel.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    /// <summary>
+    /// 恢复游戏
+    /// </summary>
+    private void ResumeGame()
+    {
+        pausePanel.SetActive(false);
+        Time.timeScale = speedSlider.value;
+    }
+
+    /// <summary>
+    /// 倍速滑条
+    /// </summary>
+    public void OnSpeedSliderValueChange()
+    {
+        speedText.text = $"{speedSlider.value}x";
+    }
+
+    /// <summary>
+    /// 按钮点击事件
+    /// </summary>
+    private void OnReturnToGameButtonClicked()
+    {
+        ResumeGame();
+    }
+
+    /// <summary>
+    /// 按钮点击事件
+    /// </summary>
+    private void OnReturnToMenuButtonClicked()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    /// <summary>
+    /// 游戏胜利
+    /// </summary>
+    public void OnGameSuccess()
+    {
+        gameSuccessPanel.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    /// <summary>
+    /// 按钮点击事件
+    /// </summary>
+    private void OnGameSuccessContinueButtonClicked()
+    {
+        gameSuccessPanel.SetActive(false);
+        Time.timeScale = speedSlider.value;
+    }
+
 }
