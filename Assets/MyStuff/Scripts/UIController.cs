@@ -31,7 +31,7 @@ public class HexUIController : MonoBehaviour
     public float screenRLMargin = 20f; // фад╩╠ъ╬Ю
     public float screenUpMargin = 150f; // фад╩╠ъ╬Ю
 
-    private HexTile currentSelectedTile;
+    public HexTile currentSelectedTile;
     private GameManager gameManager;
     private Camera mainCamera;
     private RectTransform panelRectTransform;
@@ -188,6 +188,7 @@ public class HexUIController : MonoBehaviour
 
         bool isUnlocked = currentSelectedTile.isUnlocked;
         bool isNotRebel = !currentSelectedTile.isRebelContinent;
+        TileType tileType = currentSelectedTile.tileType;
 
         string tiletext = "";
         switch(currentSelectedTile.tileType)
@@ -283,10 +284,10 @@ public class HexUIController : MonoBehaviour
             bool isAbilityAvaible = currentSelectedTile.currentDebtCollectionMethodCooldown <= 0;
             if(isAbilityAvaible)
             {
-                AbilityButton_01.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Gentle];
-                AbilityButton_02.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Legal];
-                AbilityButton_03.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Quell];
-                AbilityButton_04.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)DebtCollectionMethod.Violent];
+                AbilityButton_01.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)DebtCollectionMethod.Gentle];
+                AbilityButton_02.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)DebtCollectionMethod.Legal];
+                AbilityButton_03.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)DebtCollectionMethod.Quell];
+                AbilityButton_04.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)DebtCollectionMethod.Violent];
             }
             else
             {
@@ -302,8 +303,8 @@ public class HexUIController : MonoBehaviour
             if(!isNotRebel)
             {
                 AbilityPanel_quell.SetActive(true);
-                AbilityButton_05.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)QuellMethod.CalmDown];
-                AbilityButton_06.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)QuellMethod.Permeation];
+                AbilityButton_05.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)QuellMethod.CalmDown];
+                AbilityButton_06.interactable = gameManager.currentFunds >= HexTile.abilityCost[(int)tileType, (int)QuellMethod.Permeation];
             }
             else
             {

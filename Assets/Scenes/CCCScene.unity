@@ -741,6 +741,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toolkit: {fileID: 17301797}
+  toolkitText: {fileID: 978528606}
+  uIController: {fileID: 124194616}
+  AbilityIndex: 4
+  attributeText: 'CollectionRate: 90%\nResistanceLevel: +5%\nSupportLevel: +10% '
 --- !u!1 &449943461
 GameObject:
   m_ObjectHideFlags: 0
@@ -1239,6 +1243,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toolkit: {fileID: 1539803721}
+  toolkitText: {fileID: 787882993}
+  uIController: {fileID: 124194616}
+  AbilityIndex: 6
+  attributeText: 
 --- !u!114 &690540258 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3373467462667638587, guid: 12f9fbd6d7e9bf3408cac14ea51d0441, type: 3}
@@ -1952,6 +1960,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toolkit: {fileID: 1443133440}
+  toolkitText: {fileID: 390349542}
+  uIController: {fileID: 124194616}
+  AbilityIndex: 2
+  attributeText: 'CollectionRate: 90%\nResistanceLevel: +5%\nSupportLevel: +10% '
 --- !u!1 &1188849656
 GameObject:
   m_ObjectHideFlags: 0
@@ -2811,6 +2823,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toolkit: {fileID: 454037771}
+  toolkitText: {fileID: 1527330786}
+  uIController: {fileID: 124194616}
+  AbilityIndex: 5
+  attributeText: 
 --- !u!1 &1598976547
 GameObject:
   m_ObjectHideFlags: 0
@@ -3345,6 +3361,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 199194455}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1882004879 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8222152292253904374, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+  m_PrefabInstance: {fileID: 4240230970312739829}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1987018229
 GameObject:
   m_ObjectHideFlags: 0
@@ -3754,6 +3781,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toolkit: {fileID: 880706814}
+  toolkitText: {fileID: 1987018231}
+  uIController: {fileID: 124194616}
+  AbilityIndex: 3
+  attributeText: 'CollectionRate: 90%\nResistanceLevel: +5%\nSupportLevel: +10% '
 --- !u!1 &2064526726
 GameObject:
   m_ObjectHideFlags: 0
@@ -4250,6 +4281,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AbilityButton_01
       objectReference: {fileID: 0}
+    - target: {fileID: 3999912981298997375, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4407516634763069237, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -4329,6 +4364,18 @@ PrefabInstance:
     - target: {fileID: 4407516634763069237, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6166697613044514666, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: toolkitText
+      value: 
+      objectReference: {fileID: 1882004879}
+    - target: {fileID: 6166697613044514666, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: uIController
+      value: 
+      objectReference: {fileID: 124194616}
+    - target: {fileID: 6166697613044514666, guid: 802a2d07ca76d104b90763698841ed3c, type: 3}
+      propertyPath: attributeText
+      value: 'CollectionRate: 90%\nResistanceLevel: +5%\nSupportLevel: +10% '
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

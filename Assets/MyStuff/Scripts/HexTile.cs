@@ -14,8 +14,8 @@ public enum DebtCollectionMethod
 
 public enum QuellMethod
 {
-    CalmDown = 5,     // 温和催债
-    Permeation = 6,      // 法律催债
+    CalmDown = 5,     // 
+    Permeation = 6,      // 
 }
 
 public enum TileType
@@ -111,17 +111,13 @@ public class HexTile : MonoBehaviour
         new Vector2Int(-1, -1)   // 左下
     };
 
-    // 技能消耗
-    public static readonly float[] abilityCost = 
+    // 技能消耗, 第一个索引是tileType号，第二个索引是技能号
+    public static readonly float[,] abilityCost = new float[4,7]
     {
-        0,
-        5f,
-        25f,
-        20f,
-        0f,
-
-        150f,
-        300f
+        {0,0,0,0,0,0,0},
+        {0,     5f,25f,20f,0f,      150f,300f},
+        {0,     5f,25f,20f,0f,      150f,300f},
+        {0,     5f,25f,20f,0f,      150f,300f}
     };
 
     private static readonly float collectionRestitutionFactor = 1f / (3f * 8.0f);
@@ -242,7 +238,7 @@ public class HexTile : MonoBehaviour
 
         currentDebtCollectionMethodCooldown = DebtCollectionMethodCooldown; // 冷却
 
-        gameManager_.Spending(abilityCost[(int)method]); // Cost
+        gameManager_.Spending(abilityCost[(int)tileType,(int)method]); // Cost
 
         switch (method)
         {
@@ -281,7 +277,7 @@ public class HexTile : MonoBehaviour
     {
         if (!isRebelContinent) return;
 
-        gameManager_.Spending(abilityCost[(int)method]); // Cost
+        gameManager_.Spending(abilityCost[(int)tileType, (int)method]); // Cost
 
         switch (method)
         {
