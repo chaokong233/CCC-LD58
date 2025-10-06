@@ -1,26 +1,45 @@
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     [Header("游戏设置")]
+    public int maxFps = 120;
+
     public float initialFunds = 500f;
     public float currentFunds;
+    public float currentTime = 0f;
 
     [Header("引用")]
     public HexMapGenerator mapGenerator;
     public HexUIController uiController;
 
     private List<HexTile> unlockedTiles = new List<HexTile>();
-
     void Start()
     {
+        Application.targetFrameRate = maxFps;
+
+        currentTime = 0f;
         currentFunds = initialFunds;
         Debug.Log($"游戏开始，初始资金: {currentFunds}");
     }
 
     void Update()
     {
+        currentTime += Time.deltaTime;
+
+        // Game Success
+        int counter = 0;
+        float threshold = 0.8f;
+        int cityNumThreshold = 4;
+        foreach (var city in mapGenerator.cityTiles)
+        {
+            if (city.Value.supportLevel > threshold)
+                counter++;
+        }
+        if (counter >= cityNumThreshold)
+            uiController.OnGameSuccess();
 
     }
 

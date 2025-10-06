@@ -47,22 +47,22 @@ public class UIToolkitHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         switch(AbilityIndex)
         {
             case 1:
-                text += $"Gental Collection\n";
+                text += $"Gental Collection\nLow-yield but effective long-term strategy.\n";
                 break;
             case 2:
-                text += $"Legal Collection\n";
+                text += $"Legal Collection\nHigh immediate returns, but unwise in the long run.\n";
                 break;
             case 3:
-                text += $"Quell Collection\n";
+                text += $"Quell Collection\nFor emergency use only.\n";
                 break;
             case 4:
-                text += $"Violent Collection\n";
+                text += $"Violent Collection\nThis takes effect immediately.\n";
                 break;
             case 5:
-                text += $"CalmDown\n";
+                text += $"CalmDown\nThis will quell the public outrage and undermine their ability to unite the surrounding regions.";
                 break;
             case 6:
-                text += $"Quell\n";
+                text += $"Quell\nThis allows for the region to be reinvested in.";
                 break;
 
         }
