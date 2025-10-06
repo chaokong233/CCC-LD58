@@ -94,7 +94,7 @@ public class CameraController : MonoBehaviour
         // 如果有移动方向，更新目标位置
         if (moveDirection != Vector3.zero)
         {
-            Vector3 newPosition = targetPosition + moveDirection.normalized * moveSpeed * Time.deltaTime;
+            Vector3 newPosition = targetPosition + moveDirection.normalized * moveSpeed * Time.deltaTime / Mathf.Max(1, Time.timeScale);
 
             // 限制移动范围
             newPosition.x = Mathf.Clamp(newPosition.x, minX, maxX);
@@ -159,11 +159,11 @@ public class CameraController : MonoBehaviour
     {
         if (cam.orthographic)
         {
-            cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, Time.deltaTime * zoomSpeed);
+            cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, Time.deltaTime * zoomSpeed / Mathf.Max(1, Time.timeScale));
         }
         else
         {
-            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetZoom, Time.deltaTime * zoomSpeed);
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetZoom, Time.deltaTime * zoomSpeed / Mathf.Max(1,Time.timeScale));
         }
     }
 

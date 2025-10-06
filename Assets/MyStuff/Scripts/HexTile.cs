@@ -41,7 +41,7 @@ public class HexTile : MonoBehaviour
     [Header("Gameplay属性")]
     public float debtCost = 100.0f; // 初次借贷价格
 
-    public float collectionCooldown = 8.0f; // 产出CD
+    public float collectionCooldown = 10.0f; // 产出CD
     public float currentCollectionCooldown = 8.0f; // 当前CD
 
     public float baseCollectionValue = 8.0f; // 基础产出值
@@ -120,7 +120,11 @@ public class HexTile : MonoBehaviour
         {0,     15f,20f,35f,0f,       300f,200f}
     };
 
-    private static readonly float collectionRestitutionFactor = 1f / 60f;
+    public static readonly float[] tileTypeCostGrowth =
+        {0, 300, 40, 10};
+
+
+    private static readonly float collectionRestitutionFactor = 1f / 80f;
     private static readonly float rebelContinentLerpFactor = 0.05f;
 
     private void Awake()
@@ -216,31 +220,31 @@ public class HexTile : MonoBehaviour
         {
             case TileType.Rural:
                 debtCost = 100.0f; // 初次借贷价格
-                baseCollectionValue = 8.0f; // 基础产出值
+                baseCollectionValue = 10.0f; // 基础产出值
                 baseCollectionRate = 0.3f; // 基础收账率 0-1
                 resistanceLevel = 0.1f; // 反抗度 0-1
                 supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
-                unioLevelFractor = 0.55f; // 联结度影响因子
-                baseResistanceLevelGrowth = -0.3f / 90f; // 初始反抗度自然增长
-                regionOriginFuns = 380.0f; // 地区原始资金
+                unioLevelFractor = 0.6f; // 联结度影响因子
+                baseResistanceLevelGrowth = -0.35f / 90f; // 初始反抗度自然增长
+                regionOriginFuns = 420.0f; // 地区原始资金
                 break;
             case TileType.Suburb:
                 debtCost = 200.0f; // 初次借贷价格
-                baseCollectionValue = 20.0f; // 基础产出值
+                baseCollectionValue = 24.0f; // 基础产出值
                 baseCollectionRate = 0.2f; // 基础收账率 0-1
                 resistanceLevel = 0.1f; // 反抗度 0-1
                 supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
-                unioLevelFractor = 0.3f; // 联结度影响因子
+                unioLevelFractor = 0.5f; // 联结度影响因子
                 baseResistanceLevelGrowth = -0.0025f; // 初始反抗度自然增长
-                regionOriginFuns = 8000.0f; // 地区原始资金
+                regionOriginFuns = 800.0f; // 地区原始资金
                 break;
             case TileType.City:
                 debtCost = 1000.0f; // 初次借贷价格
-                baseCollectionValue = 80f; // 基础产出值
+                baseCollectionValue = 120f; // 基础产出值
                 baseCollectionRate = 0.1f; // 基础收账率 0-1
                 resistanceLevel = 0.1f; // 反抗度 0-1
                 supportLevel_temp = 0.0f; // 不受联结度影响前的支持度
-                unioLevelFractor = 0.1f; // 联结度影响因子
+                unioLevelFractor = 0.4f; // 联结度影响因子
                 baseResistanceLevelGrowth = -0.001f; // 初始反抗度自然增长
                 regionOriginFuns = 5000.0f; // 地区原始资金
                 break;
@@ -293,7 +297,7 @@ public class HexTile : MonoBehaviour
                 break;
             case DebtCollectionMethod.Quell:
                 currentCollectionRate = Math.Max(0.60f, currentCollectionRate);
-                supportLevel += 0.08f;
+                supportLevel_temp += 0.08f;
                 resistanceLevel += -0.60f;
                 break;
             case DebtCollectionMethod.Violent:
@@ -331,10 +335,10 @@ public class HexTile : MonoBehaviour
         unioLevel = (float)(mapGenerator_.unlockedTileTypeCounter[(int)tileType]) / (float)(mapGenerator_.tileTypeCounter[(int)tileType]);
 
         // 杠杆, 时间乘数
-        LeverageLevel = totalGain / (regionOriginFuns + totalGain * Mathf.Max(1f, 2f - gameManager_.currentTime * 0.2f / 60f));
+        LeverageLevel = totalGain / (regionOriginFuns + totalGain * Mathf.Max(1f, 2.5f - gameManager_.currentTime * 0.2f / 60f));
 
-        float LeverageLevelMutiplier = 0.0487f;
-        float supportLevelLevelMutiplier = -0.033f;
+        float LeverageLevelMutiplier = 0.0389f;
+        float supportLevelLevelMutiplier = -0.032f;
         // 反抗度（民怨值）自然增长
         resistanceLevelGrowth = baseResistanceLevelGrowth + LeverageLevel * LeverageLevelMutiplier + supportLevel * supportLevelLevelMutiplier;
 

@@ -527,6 +527,23 @@ public class HexMapGenerator : MonoBehaviour
         return randomTile;
     }
 
+    /// <summary>
+    /// 解锁指定坐标的地块
+    /// </summary>
+    public float GetTileCostAtCoord(int q, int r)
+    {
+        Vector2Int coord = new Vector2Int(q, r);
+        if (hexMap.TryGetValue(coord, out HexTile tile))
+        {
+            TileType type = tile.tileType;
+
+            float cost = tile.debtCost + (unlockedTileTypeCounter[(int)type]) * HexTile.tileTypeCostGrowth[(int)type];
+            return cost;
+        }
+
+        Debug.LogWarning($"找不到坐标 ({q}, {r}) 的地块");
+        return -1;
+    }
 
     /// <summary>
     /// 解锁指定坐标的地块

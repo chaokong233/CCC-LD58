@@ -45,6 +45,7 @@ public class HexUIController : MonoBehaviour
 
     public HexTile currentSelectedTile;
     private GameManager gameManager;
+    private HexMapGenerator mapGenerator;
     private Camera mainCamera;
     private RectTransform panelRectTransform;
 
@@ -52,7 +53,8 @@ public class HexUIController : MonoBehaviour
     {
         mainCamera = Camera.main;
         gameManager = FindFirstObjectByType<GameManager>();
-
+        mapGenerator = FindFirstObjectByType<HexMapGenerator>();
+        
         // 绑定按钮事件
         unlockButton.onClick.AddListener(OnUnlockButtonClicked);
 
@@ -150,9 +152,9 @@ public class HexUIController : MonoBehaviour
         currentSelectedTile = tile;
 
         if (hexPanel != null)
-        {
+        {       
             hexPanel.SetActive(true);
-            SetUnlockCost(currentSelectedTile.debtCost);
+            SetUnlockCost(mapGenerator.GetTileCostAtCoord(currentSelectedTile.q, currentSelectedTile.r));
 
             // 更新面板位置（确保在屏幕内）
             UpdatePanelPosition(tile.transform.position);
