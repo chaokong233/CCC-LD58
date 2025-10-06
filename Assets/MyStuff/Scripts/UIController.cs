@@ -2,6 +2,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HexUIController : MonoBehaviour
@@ -22,6 +23,11 @@ public class HexUIController : MonoBehaviour
     public GameObject AbilityPanel_quell;
     public Button AbilityButton_05;
     public Button AbilityButton_06;
+    [Header("   Pause")]
+    public GameObject pausePanel;
+    public Button returnToGameButton;
+    public Button returnToMenuButton;
+
 
     [Header("解锁设置")]
     public float unlockCost = 100f;
@@ -46,12 +52,16 @@ public class HexUIController : MonoBehaviour
 
         // 绑定按钮事件
         unlockButton.onClick.AddListener(OnUnlockButtonClicked);
+
         AbilityButton_01.onClick.AddListener(OnAbilityButton_01_ButtonClicked);
         AbilityButton_02.onClick.AddListener(OnAbilityButton_02_ButtonClicked);
         AbilityButton_03.onClick.AddListener(OnAbilityButton_03_ButtonClicked);
         AbilityButton_04.onClick.AddListener(OnAbilityButton_04_ButtonClicked);
         AbilityButton_05.onClick.AddListener(OnAbilityButton_05_ButtonClicked);
         AbilityButton_06.onClick.AddListener(OnAbilityButton_06_ButtonClicked);
+
+        returnToGameButton.onClick.AddListener(OnReturnToGameButtonClicked);
+        returnToMenuButton.onClick.AddListener(OnReturnToMenuButtonClicked);
 
         // AbilityButton_01.
 
@@ -63,6 +73,9 @@ public class HexUIController : MonoBehaviour
         if (hexPanel != null)
             hexPanel.SetActive(false);
 
+        // 初始隐藏面板
+        if (pausePanel != null)
+            pausePanel.SetActive(false);
     }
 
     void Update()
@@ -88,7 +101,14 @@ public class HexUIController : MonoBehaviour
         // 按ESC关闭面板
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            HidePanel();
+            if (hexPanel.activeSelf)
+                HidePanel();
+            else if (pausePanel.activeSelf)
+            {
+                ResumeGame();
+            }
+            else
+                PauseGame();
         }
     }
 
@@ -401,5 +421,40 @@ public class HexUIController : MonoBehaviour
     {
         unlockCost = cost;
         UpdatePanelInfo();
+    }
+
+
+    /// <summary>
+    /// 暂停游戏
+    /// </summary>
+    private void PauseGame()
+    {
+        pausePanel.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    /// <summary>
+    /// 恢复游戏
+    /// </summary>
+    private void ResumeGame()
+    {
+        pausePanel.SetActive(false);
+        Time.timeScale = 1;
+    }
+
+    /// <summary>
+    /// 按钮点击事件
+    /// </summary>
+    private void OnReturnToGameButtonClicked()
+    {
+        ResumeGame();
+    }
+
+    /// <summary>
+    /// 按钮点击事件
+    /// </summary>
+    private void OnReturnToMenuButtonClicked()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
