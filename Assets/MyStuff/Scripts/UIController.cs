@@ -118,7 +118,7 @@ public class HexUIController : MonoBehaviour
         if (gameManager != null && fundsText != null)
         {
             float currentTime = gameManager.currentTime;
-            fundsText.text = $"Fund: {gameManager.currentFunds:F0}\nTime: {currentTime/60:F0}min{currentTime%60:F1}s";
+            fundsText.text = $"资金: {gameManager.currentFunds:F0}\n时间: {currentTime/60:F0}min{currentTime%60:F1}s";
         }
 
         // 按ESC关闭面板
@@ -236,49 +236,49 @@ public class HexUIController : MonoBehaviour
         TileType tileType = currentSelectedTile.tileType;
 
         string tiletext = "";
-        string rebelLable = isNotRebel ? "\n" : "(Rebel)\n";
-        string cityLable = isUnlocked ? "" : "Prosperous but Hard-to-Control Region\n\n";
-        string suburbLable = isUnlocked ? "" : "Relatively Prosperous Region\n\n";
-        string ruralLable = isUnlocked ? "" : "Average Region\n\n";
+        string rebelLable = isNotRebel ? "\n" : "(反叛)\n";
+        string cityLable = isUnlocked ? "" : "富庶但难以掌控的地区\n\n";
+        string suburbLable = isUnlocked ? "" : "相对富裕的地区\n\n";
+        string ruralLable = isUnlocked ? "" : "被时代抛弃的地区\n\n";
 
         switch (currentSelectedTile.tileType)
         {
             case TileType.City:
-                tiletext += "City"+ rebelLable + cityLable;
+                tiletext += "城市"+ rebelLable + cityLable;
                 break;
             case TileType.Suburb:
-                tiletext += "Suburb" + rebelLable + suburbLable;
+                tiletext += "郊区" + rebelLable + suburbLable;
                 break;
             case TileType.Rural:
-                tiletext += "Rural" + rebelLable + ruralLable;
+                tiletext += "农村" + rebelLable + ruralLable;
                 break;
             case TileType.Mountain:
-                tiletext += "Mountain" + rebelLable + "It's a terrain obstacle.";
+                tiletext += "山地" + rebelLable + "这是一个地块障碍。";
                 break;
             case TileType.Lake:
-                tiletext += "Lake" + rebelLable + "It's a terrain obstacle.";
+                tiletext += "湖泊" + rebelLable + "这是一个地块障碍。";
                 break;
         }
 
         // 更新地块信息文本
         if (isUnlocked && isNotRebel)
         {
-            tiletext += string.Format("Collection:{0:P1}\n", currentSelectedTile.currentCollectionRate)
-                + string.Format("ResistanceLevel:{0:P1}\n\n", currentSelectedTile.resistanceLevel)
-                + string.Format("SupportLevel:{0:P1}\n", currentSelectedTile.supportLevel)
-                + string.Format("LeverageLevel:{0:P1}\n", currentSelectedTile.LeverageLevel)
-                + string.Format("UnionLevel:{0:P1}\n", currentSelectedTile.unioLevel);
+            tiletext += string.Format("收益率:{0:P1}\n", currentSelectedTile.currentCollectionRate)
+                + string.Format("反抗度:{0:P1}\n\n", currentSelectedTile.resistanceLevel)
+                + string.Format("支持度:{0:P1}\n", currentSelectedTile.supportLevel)
+                + string.Format("杠杆度:{0:P1}\n", currentSelectedTile.LeverageLevel)
+                + string.Format("联合度:{0:P1}\n", currentSelectedTile.unioLevel);
             tileInfoText.text = tiletext;
         }
         else
         {
             if(!isNotRebel)
             {
-                tiletext += "the tile rebel\nCost to Quell it";
+                tiletext += "这个地区反叛了\n花钱来平复它";
             }
             else if(!isUnlocked)
             {
-                tiletext += $"One-Time Income:{currentSelectedTile.baseCollectionValue}\nIncome Cooldown:{currentSelectedTile.currentCollectionCooldown}";
+                tiletext += $"单次收入:{currentSelectedTile.baseCollectionValue}\n收入cd:{currentSelectedTile.currentCollectionCooldown}s";
             }
             tileInfoText.text = tiletext;
         }
@@ -287,7 +287,7 @@ public class HexUIController : MonoBehaviour
         if (isUnlocked)
         {
             unlockButton.interactable = false;
-            costText.text = "Unlocked";
+            costText.text = "已解锁";
         }
         else
         {
@@ -309,17 +309,17 @@ public class HexUIController : MonoBehaviour
             {
                 unlockButton.interactable = true;
                 // 更新成本文本
-                costText.text = $"Lending Cost:{unlockCost}";
+                costText.text = $"解锁花费:{unlockCost}";
             }
             else
             {
                 unlockButton.interactable = false;
                 if(!isNotObstacle)
-                    costText.text = $"(Cannot be unlocked)";
+                    costText.text = $"（不可解锁）";
                 else if (!hasUnlockedNeighbor)
-                    costText.text = $"Lending Cost:{unlockCost}\n(Not adjacent)";
+                    costText.text = $"解锁花费:{unlockCost}\n（不相邻）";
                 else if(!enoughFunds)
-                    costText.text = $"Lending Cost:{unlockCost}\n(Insufficient funds)";
+                    costText.text = $"解锁花费:{unlockCost}\n（资金不足）";
             }         
         }
 

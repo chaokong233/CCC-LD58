@@ -47,27 +47,27 @@ public class UIToolkitHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         switch(AbilityIndex)
         {
             case 1:
-                text += $"Gental Collection\nLow-yield but effective long-term strategy.\n";
+                text += $"温柔催账\n低收益但长期有效的方式.\n";
                 break;
             case 2:
-                text += $"Legal Collection\nHigh immediate returns, but unwise in the long run.\n";
+                text += $"法律催账\n高收益，但长期来看并不明智.\n";
                 break;
             case 3:
-                text += $"Quell Collection\nFor emergency use only.\n";
+                text += $"平息众怒\n紧急情况下使用.\n";
                 break;
             case 4:
-                text += $"Violent Collection\nThis takes effect immediately.\n";
+                text += $"暴力催账\n这是立即见效的.\n";
                 break;
             case 5:
-                text += $"CalmDown\nThis will quell the public outrage and undermine their ability to unite the surrounding regions.";
+                text += $"平息众怒\n这将平息人民的情绪，使他们不对周边地区产生影响.";
                 break;
             case 6:
-                text += $"Quell\nThis allows for the region to be reinvested in.";
+                text += $"平复\n这将重新解锁这个地区.";
                 break;
 
         }
 
-        text += $"\nCost: {HexTile.abilityCost[(int)tileType, AbilityIndex]}\n";
+        text += $"\n花费: {HexTile.abilityCost[(int)tileType, AbilityIndex]}\n";
         text += attributeText;
 
         toolkitText.text = text;
